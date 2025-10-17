@@ -5,7 +5,7 @@ import axios from 'axios';
 
 // Configuration for the central marketplace contract
 import { MARKETPLACE_ADDRESS } from '../config.js';
-import marketplaceAbi from 'E:/web/blc/show-booking-app/artifacts/contracts/Marketplace.sol/Marketplace.json';
+import marketplaceAbi from '../../artifacts/contracts/Marketplace.sol/Marketplace.json';
 
 export const AppContext = createContext();
 

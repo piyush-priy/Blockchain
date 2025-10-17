@@ -4,7 +4,7 @@ import { AppContext } from '../context/AppContext';
 import PageTitle from '../components/PageTitle';
 import EventForm from '../components/EventForm';
 
-import TicketNFT from '../..artifacts/contracts/TicketNFT.sol/TicketNFT.json';
+import TicketNFT from '../../artifacts/contracts/TicketNFT.sol/TicketNFT.json';
 
 const OrganizerDashboardPage = () => {
     const { user, provider, showMessage } = useContext(AppContext);

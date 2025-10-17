@@ -31,11 +31,11 @@ const RegisterPage = () => {
         }
 
         // **THE FIX IS HERE**: Ensure a wallet is connected before allowing registration.
-        if (!account) {
-            setError("Please connect your wallet to register.");
-            toast.error("Please connect your wallet first.");
-            return;
-        }
+        // if (!account) {
+        //     setError("Please connect your wallet to register.");
+        //     toast.error("Please connect your wallet first.");
+        //     return;
+        // }
 
         setLoading(true);
         const result = await register(
@@ -126,7 +126,7 @@ const RegisterPage = () => {
                     <div>
                         <button
                             type="submit"
-                            disabled={loading || !account}
+                            disabled={loading}
                             className="w-full px-4 py-2 font-bold text-white bg-cyan-600 rounded-md hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500 focus:ring-offset-gray-800 disabled:bg-gray-500 disabled:cursor-not-allowed"
                         >
                             {loading ? 'Registering...' : 'Register'}

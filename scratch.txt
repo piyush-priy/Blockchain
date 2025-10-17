@@ -1,0 +1,7 @@
+Database schema:
+
+Table Users (id, createdAt, updatedAt, firstName, lastName, email, password, role, walletAddress)
+Table Organisers (id, createdAt, updatedAt, organizerName(firstName), companyName(lastName), email, password, role, organizerWalletAddress)
+Table events (//something)
+Table tickets (//something)
+
