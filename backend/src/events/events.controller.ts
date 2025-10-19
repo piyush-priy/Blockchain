@@ -6,9 +6,10 @@ import {
   Delete,
   Param,
   Body,
+  Req,
   UseGuards,
   BadRequestException,
-  NotFoundException,
+  ForbiddenException,
   InternalServerErrorException,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
@@ -26,13 +27,14 @@ export class EventsController {
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('organizer')
   @Post()
-  async createEvent(@Body() dto: CreateEventDto) {
+  async createEvent(@Body() dto: CreateEventDto, @Req() req: any) {
     if (!dto.name || !dto.date || !dto.venue || !dto.type || !dto.description || !dto.posterUrl) {
       throw new BadRequestException(
         'Missing required fields: name, date, venue, type, description, posterUrl.'
       );
     }
-    return this.eventsService.createEvent(dto);
+    const organizerId = req.user.id;
+    return this.eventsService.createEvent(dto, organizerId);
   }
 
 
@@ -43,6 +45,24 @@ export class EventsController {
   }
 
   
+  // --- Get Event by ID ---
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('organizer')
+  @Get('organizer/:id')
+  async getOrganizerEvents(@Param('id') id: string, @Req() req: any) {
+    const organizerIdParam = +id;
+    const requestingUserId = req.user.id;
+
+    // --- Security Check ---
+    // Make sure the logged-in user is not trying to access another organizer's events
+    if (organizerIdParam !== requestingUserId) {
+      throw new ForbiddenException("You are not authorized to view these events.");
+    }
+
+    return this.eventsService.getEventsByOrganizer(requestingUserId);
+  }
+
+
   // --- Update Event (Organizer Only) ---
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('organizer')

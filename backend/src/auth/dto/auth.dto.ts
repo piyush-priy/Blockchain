@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import { IsEmail, IsNotEmpty, IsOptional, IsEthereumAddress, IsString, MinLength } from 'class-validator';
 
 export class CreateUserDto {
     @IsString()
@@ -37,4 +37,12 @@ export class LoginUserDto {
     @IsNotEmpty()
     password: string;
 
+}
+
+export class UpdateWalletDto {
+  @IsString()
+  @IsNotEmpty()
+  @IsEthereumAddress() // Strongly recommended to validate the address format
+  walletAddress: string;
+  
 }

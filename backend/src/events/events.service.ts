@@ -9,7 +9,7 @@ export class EventsService {
     constructor(private prisma : PrismaService) {}
 
     //Create Event
-    async createEvent(dto: CreateEventDto) {
+    async createEvent(dto: CreateEventDto, organizerId: number) {
         try {
             const seatLayoutJSON =
                 typeof dto.seatLayout === 'object'
@@ -18,6 +18,7 @@ export class EventsService {
 
             return await this.prisma.events.create({
                 data: {
+                    organizerId: organizerId,
                     name: dto.name.trim(),
                     date: dto.date,
                     venue: dto.venue.trim(),
@@ -58,6 +59,36 @@ export class EventsService {
             };
         } catch (err) {
             throw new InternalServerErrorException('Failed to fetch events: ' + err.message);
+        }
+    }
+
+
+    //Get events hosted by an organizer
+    async getEventsByOrganizer(organizerId: number) {
+        try {
+            const events = await this.prisma.events.findMany({
+                where: {
+                    organizerId: organizerId,
+                },
+                orderBy: {
+                    date: 'desc',
+                }
+            });
+
+            // Return an empty array if no events are found
+            if (!events.length) {
+                return [];
+            }
+
+            // Return events with parsed seatLayout, just like in getAllEvents
+            return events.map((event) => ({
+                ...event,
+                seatLayout: this.safeParseJSON(event.seatLayout),
+            }));
+
+        } catch (err) {
+            console.error('Failed to fetch organizer events:', err);
+            throw new InternalServerErrorException('Failed to fetch organizer events.');
         }
     }
 

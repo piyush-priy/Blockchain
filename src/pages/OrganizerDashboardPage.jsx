@@ -7,7 +7,7 @@ import EventForm from '../components/EventForm';
 import TicketNFT from '../../artifacts/contracts/TicketNFT.sol/TicketNFT.json';
 
 const OrganizerDashboardPage = () => {
-    const { user, provider, showMessage } = useContext(AppContext);
+    const { currentUser:user, provider, showMessage } = useContext(AppContext);
     const [organizerEvents, setOrganizerEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState('dashboard');
@@ -20,10 +20,11 @@ const OrganizerDashboardPage = () => {
             const response = await fetch(`http://localhost:3001/events/organizer/${user.id}`, {
                  headers: { 'Authorization': `Bearer ${token}` }
             });
+            console.log(response);
             if (!response.ok) throw new Error("Could not fetch organizer events.");
             
             const eventsData = await response.json();
-
+            console.log("Fetched organizer events:", eventsData);
             if (!provider) {
                 setOrganizerEvents(eventsData.map(e => ({...e, balance: '0.0'})));
                 return;

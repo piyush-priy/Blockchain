@@ -137,7 +137,20 @@ contract TicketNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, ERC29
         override(ERC721, ERC721Enumerable)
         returns (address)
     {
-        return super._update(to, tokenId, auth);
+        address from = _ownerOf(tokenId);
+
+        // Allow minting (when 'from' is address(0))
+        if (from == address(0)) {
+            return super._update(to, tokenId, auth);
+        }
+
+        // Allow transfers TO or FROM the approved marketplace
+        if (to == marketplaceAddress || from == marketplaceAddress) {
+            return super._update(to, tokenId, auth);
+        }
+
+        // Block all other transfers
+        revert("TicketNFT: Transfers are only allowed via the marketplace");
     }
 
     function _increaseBalance(address account, uint128 value)

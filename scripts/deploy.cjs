@@ -21,6 +21,10 @@ async function main() {
   await marketplace.waitForDeployment();
   const marketplaceAddress = await marketplace.getAddress();
   console.log("Marketplace deployed to:", marketplaceAddress);
+
+  console.log("\n--- Frontend Config ---");
+  console.log(`export const MARKETPLACE_ADDRESS = "${marketplaceAddress}";`);
+  console.log(`export const TICKET_NFT_FACTORY_ADDRESS = "${ticketNFTFactoryAddress}";`);
 }
 
 main()

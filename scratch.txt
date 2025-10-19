@@ -5,3 +5,7 @@ Table Organisers (id, createdAt, updatedAt, organizerName(firstName), companyNam
 Table events (//something)
 Table tickets (//something)
 
+Broken API Endpoints
+GET http://localhost:3001/events/${event.id}/unavailable-seats
+POST http://localhost:3001/metadata/temp
+GET http://localhost:3001/events/organizer/${user.id}

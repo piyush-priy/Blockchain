@@ -22,8 +22,10 @@ model Users {
   lastName      String?
   email         String   @unique
   password      String
-  role          String   @default("USER")
-  walletAddress String?   @unique
+  role          String   @default("user")
+  walletAddress String?
+
+  createdEvents Events[]
 }
 
 model Tickets {
@@ -51,6 +53,8 @@ model Events {
   seatLayout String?
   type String?
   contractAddress String?
+  organizerId Int
 
+  organizer   Users @relation(fields: [organizerId], references: [id])
   tickets Tickets[]
 }
