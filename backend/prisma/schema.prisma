@@ -36,6 +36,7 @@ model Tickets {
   ownerWallet String?
   status String @default("valid")
   purchasePrice Int @default(0)
+  seatIdentifier String
 
   event Events @relation (fields: [eventId], references: [id])
 }
@@ -43,7 +44,7 @@ model Tickets {
 model Events {
   id Int @id @default(autoincrement())
   name String
-  date String
+  date DateTime
   venue String
   status String @default("Pending")
   maxResaleCount Int @default(3)

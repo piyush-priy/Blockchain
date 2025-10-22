@@ -39,7 +39,7 @@ const AppRoutes = () => {
                 <Routes>
                     <Route path="/catalog" element={<UserCatalogPage />} />
                     <Route path="/event/:eventId" element={<EventDetailPage />} />
-                    <Route path="/select-seats" element={<SeatSelectionPage />} />
+                    <Route path="event/:eventId/seats" element={<SeatSelectionPage />} />
                     <Route path="/book" element={<BookingPage />} />
                     <Route path="/profile" element={<UserProfilePage />} />
                     <Route path="/scanner" element={<ScannerPage />} />

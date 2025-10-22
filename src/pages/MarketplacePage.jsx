@@ -29,18 +29,24 @@ const MarketplacePage = () => {
                 const unlistedEvents = await marketplaceContract.queryFilter(unlistedFilter);
                 
                 // Create a set of unique identifiers for tickets that are no longer active
+                // const soldOrUnlisted = new Set([
+                //     ...soldEvents.map(e => `${e.args.nftContract}-${e.args.tokenId}`),
+                //     ...unlistedEvents.map(e => `${e.args.nftContract}-${e.args.tokenId}`)
+                // ]);
+
+                // We now use listingId as the unique key for sold/unlisted tickets
                 const soldOrUnlisted = new Set([
-                    ...soldEvents.map(e => `${e.args.nftContract}-${e.args.tokenId}`),
-                    ...unlistedEvents.map(e => `${e.args.nftContract}-${e.args.tokenId}`)
+                    ...soldEvents.map(e => e.args.listingId.toString()),
+                    ...unlistedEvents.map(e => e.args.listingId.toString())
                 ]);
 
                 // Filter out the events for tickets that have been sold or unlisted
-                const activeListings = listedEvents.filter(e => !soldOrUnlisted.has(`${e.args.nftContract}-${e.args.tokenId}`));
+                const activeListings = listedEvents.filter(e => !soldOrUnlisted.has(e.args.listingId.toString()));
 
                 // Fetch metadata for each active listing
                 const ticketsWithMetadata = await Promise.all(
                     activeListings.map(async (e) => {
-                        const { nftContract, tokenId, seller, price } = e.args;
+                        const { listingId, nftContract, tokenId, seller, price } = e.args;
                         const ticketContract = new ethers.Contract(nftContract, TicketNFT.abi, provider);
                         const tokenUri = await ticketContract.tokenURI(tokenId);
                         
@@ -49,6 +55,7 @@ const MarketplacePage = () => {
                         const metadata = await metadataResponse.json();
                         
                         return {
+                            listingId,
                             nftContract,
                             tokenId,
                             seller,
@@ -69,7 +76,7 @@ const MarketplacePage = () => {
         };
 
         fetchListedTickets();
-    }, [provider]);
+    }, [provider, showMessage]);
 
     const handleBuyTicket = async (ticket) => {
         if (!provider) {
@@ -86,7 +93,7 @@ const MarketplacePage = () => {
 
             showMessage("Purchase successful! The ticket is now in your wallet.", "success");
             // Refresh the list after purchase
-            setListedTickets(prev => prev.filter(t => t.tokenId !== ticket.tokenId || t.nftContract !== ticket.nftContract));
+            setListedTickets(prev => prev.filter(t => t.listingId.toString() !== ticket.listingId.toString()));
 
         } catch (error) {
             console.error("Purchase failed:", error);
@@ -106,19 +113,39 @@ const MarketplacePage = () => {
                 </div>
             ) : (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                    {listedTickets.map(ticket => (
-                        <div key={`${ticket.nftContract}-${ticket.tokenId}`} className="bg-gray-800 rounded-lg shadow-lg p-4 flex flex-col justify-between transform hover:-translate-y-1 transition-transform">
-                            <img src={ticket.image} alt={ticket.name} className="rounded-md mb-4"/>
-                            <div>
-                                <h3 className="text-xl font-bold text-white truncate">{ticket.name}</h3>
-                                <p className="text-gray-400 text-sm truncate">Seller: {ticket.seller}</p>
-                                <p className="text-lg font-semibold text-indigo-400 mt-2">{ethers.formatEther(ticket.price)} ETH</p>
+                    {listedTickets.map(ticket => {
+                        // Helper function to find attributes from the metadata
+                        const findAttr = (trait_type) => {
+                            const attr = ticket.attributes?.find(a => a.trait_type === trait_type);
+                            return attr ? attr.value : 'N/A';
+                        };
+                        const eventDate = findAttr('Date');
+                        const eventVenue = findAttr('Venue');
+                        
+                        // Format the date for display
+                        const formattedDate = eventDate !== 'N/A' 
+                            ? new Date(eventDate).toLocaleDateString() 
+                            : 'N/A';
+
+                        return (
+                            <div key={ticket.listingId.toString()} className="bg-gray-800 rounded-lg shadow-lg p-4 flex flex-col justify-between transform hover:-translate-y-1 transition-transform">
+                                <img src={ticket.image} alt={ticket.name} className="rounded-md mb-4 aspect-[2/3] object-cover"/>
+                                <div>
+                                    <h3 className="text-xl font-bold text-white truncate">{ticket.name}</h3>
+                                    <p className="text-gray-400 text-sm truncate">Seller: {ticket.seller}</p>
+                                    
+                                    {/* --- ADDED DATE AND VENUE --- */}
+                                    <p className="text-gray-400 text-sm truncate">Venue: {eventVenue}</p>
+                                    <p className="text-gray-400 text-sm">Date: {formattedDate}</p>
+
+                                    <p className="text-lg font-semibold text-indigo-400 mt-2">{ethers.formatEther(ticket.price)} ETH</p>
+                                </div>
+                                <button onClick={() => handleBuyTicket(ticket)} className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
+                                    Buy Ticket
+                                </button>
                             </div>
-                            <button onClick={() => handleBuyTicket(ticket)} className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-                                Buy Ticket
-                            </button>
-                        </div>
-                    ))}
+                        );
+                    })}
                 </div>
             )}
         </div>

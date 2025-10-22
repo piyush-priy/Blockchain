@@ -61,7 +61,10 @@ contract TicketNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, ERC29
      * @param uri The metadata URI for the ticket.
      * @param initialPrice The price of the primary sale.
      */
-    function mint(address to, string memory uri, uint256 initialPrice) public onlyOwner {
+    function mint(address to, string memory uri, uint256 initialPrice) public payable {
+        // 1. Check that the ETH sent (msg.value) matches the price.
+        require(msg.value >= initialPrice, "TicketNFT: Must send correct price to mint");
+        
         uint256 tokenId = _nextTokenId++;
         _safeMint(to, tokenId);
         // FIX: This function is now available by inheriting from ERC721URIStorage
@@ -80,6 +83,20 @@ contract TicketNFT is ERC721, ERC721Enumerable, ERC721URIStorage, Ownable, ERC29
         require(balance > 0, "No funds to withdraw.");
         (bool success, ) = owner().call{value: balance}("");
         require(success, "Withdrawal failed.");
+    }
+
+    /**
+     * @dev Burns a ticket after it has been used.
+     * This can only be called by the contract owner (organizer).
+     * @param tokenId The token to burn.
+     */
+    function burnTicket(uint256 tokenId) public onlyOwner {
+        // _burn() is an internal function from ERC721.sol
+        // It will delete the token and its URI.
+        _burn(tokenId);
+        
+        // We can also delete our internal data for gas refunds
+        delete ticketData[tokenId];
     }
 
     /**

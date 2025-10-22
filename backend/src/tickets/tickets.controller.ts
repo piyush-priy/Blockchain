@@ -6,11 +6,14 @@ import {
   Param,
   UseGuards,
   Req,
+  HttpCode,
+  HttpStatus,
   BadRequestException,
   NotFoundException,
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { ConfirmBurnDto } from './dto/confirm-burn.dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
@@ -49,8 +52,8 @@ export class TicketsController {
     @Param('tokenId') tokenId: number,
     @Param('contractAddress') contractAddress: string,
   ) {
-    return this.ticketsService.getTicketStatus(tokenId, contractAddress);
-  }
+      return this.ticketsService.getTicketStatus(tokenId, contractAddress);
+    }
 
   @Get('/metadata/:tokenId/:contractAddress')
   async getTicketMetadata(
@@ -59,4 +62,34 @@ export class TicketsController {
   ) {
     return this.ticketsService.getTicketMetadata(tokenId, contractAddress);
   }
+
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('organizer', 'admin')
+  @Post('validate-burn')
+  @HttpCode(HttpStatus.OK)
+  async validateTicketForBurn(@Body('tokenId') tokenId: number, @Body('contractAddress') contractAddress: string, @Req() req: Request) {
+    if (tokenId === undefined || !contractAddress) {
+      throw new BadRequestException('tokenId and contractAddress are required.');
+    }
+    const user = req.user as any;
+
+    const validationResult = await this.ticketsService.validateTicketForBurn(
+      tokenId,
+      contractAddress,
+      user.id
+    );
+
+    // If validation passes, return success. Frontend will then call the contract.
+    return { message: 'Ticket is valid for burning.' }
+  }
+
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('organizer', 'admin')
+  @Post('confirm-burn')
+  @HttpCode(HttpStatus.OK)
+  async confirmBurn(@Body() confirmBurnDto: ConfirmBurnDto) {
+    return this.ticketsService.confirmTicketBurn(confirmBurnDto);
+  }
+
 }

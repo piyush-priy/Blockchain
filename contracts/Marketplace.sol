@@ -98,10 +98,12 @@ contract Marketplace is Ownable {
         emit TicketSold(listingId, tokenId, nftContract, msg.sender, price);
     }
 
-    function unlistTicket(uint256 listingId, uint256 tokenId) external {
+    function unlistTicket(uint256 listingId) external {
         Listing storage listing = listings[listingId];
         require(listing.seller == msg.sender, "Marketplace: You are not the seller");
 
+        // Get the tokenId from the struct
+        uint256 tokenId = listing.tokenId; 
         address nftContract = listing.nftContract;
         
         // Clear the listing

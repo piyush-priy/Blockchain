@@ -12,27 +12,28 @@ export class EventsService {
     async createEvent(dto: CreateEventDto, organizerId: number) {
         try {
             const seatLayoutJSON =
-                typeof dto.seatLayout === 'object'
+            typeof dto.seatLayout === 'object'
                 ? JSON.stringify(dto.seatLayout)
                 : dto.seatLayout;
 
             return await this.prisma.events.create({
                 data: {
-                    organizerId: organizerId,
+                    organizerId, // matches Prisma schema
                     name: dto.name.trim(),
-                    date: dto.date,
+                    date: new Date(dto.date), // DateTime type in schema
                     venue: dto.venue.trim(),
+                    status: dto.status ?? 'Pending', // optional field with default in DB
                     maxResaleCount: dto.maxResaleCount ?? 3,
                     priceCap: dto.priceCap ?? 120,
-                    description: dto.description,
-                    posterUrl: dto.posterUrl,
+                    description: dto.description?.trim(),
+                    posterUrl: dto.posterUrl?.trim(),
                     seatLayout: seatLayoutJSON,
-                    type: dto.type,
+                    type: dto.type?.trim(),
+                    contractAddress: dto.contractAddress?.trim() || null,
                 },
             });
         } catch (err) {
             if (err instanceof PrismaClientKnownRequestError) {
-                // Handle known Prisma constraint errors
                 if (err.code === 'P2002') {
                     throw new ConflictException('An event with this name or ID already exists.');
                 }
@@ -40,6 +41,7 @@ export class EventsService {
             throw new InternalServerErrorException('Failed to create event: ' + err.message);
         }
     }
+
 
     
     //Get All Events
@@ -128,6 +130,31 @@ export class EventsService {
             throw new InternalServerErrorException('Failed to update event: ' + err.message);
         }
 
+    }
+
+    //Get unavailable seats for an event
+    async getUnavailableSeats(eventId: number) {
+        try {
+            const tickets = await this.prisma.tickets.findMany({
+                where: {
+                    eventId: eventId,
+                },
+                select: {
+                    seatIdentifier: true,
+                },
+            });
+
+            // Extract the seat identifiers into a simple array of strings
+            // Filter out any potential null/empty values just in case
+            const unavailableSeats = tickets
+                .map(ticket => ticket.seatIdentifier)
+                .filter((seatId): seatId is string => !!seatId);
+
+            return { unavailableSeats };
+        } catch (err) {
+            console.error(`Failed to fetch unavailable seats for event ${eventId}:`, err);
+            return [];
+        }
     }
 
 

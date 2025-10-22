@@ -11,6 +11,7 @@ import {
   BadRequestException,
   ForbiddenException,
   InternalServerErrorException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -25,7 +26,7 @@ export class EventsController {
 
   // --- Create Event (Organizer Only) ---
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('organizer')
+  // @Roles('organizer')
   @Post()
   async createEvent(@Body() dto: CreateEventDto, @Req() req: any) {
     if (!dto.name || !dto.date || !dto.venue || !dto.type || !dto.description || !dto.posterUrl) {
@@ -34,6 +35,7 @@ export class EventsController {
       );
     }
     const organizerId = req.user.id;
+    console.log('Creating event for organizer ID:', organizerId);
     return this.eventsService.createEvent(dto, organizerId);
   }
 
@@ -69,6 +71,13 @@ export class EventsController {
   @Put(':id')
   async updateEvent(@Param('id') id: string, @Body() dto: UpdateEventDto) {
     return this.eventsService.updateEvent(+id, dto);
+  }
+
+
+  // --- Get Unavailable Seats for Event ---
+  @Get(':id/unavailable-seats')
+  async getUnavailableSeats(@Param('id', ParseIntPipe) eventId: number) {
+    return this.eventsService.getUnavailableSeats(eventId);
   }
 
 

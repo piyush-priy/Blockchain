@@ -1,4 +1,4 @@
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, useContext, useCallback } from 'react';
 import { ethers } from 'ethers';
 import toast from 'react-hot-toast';
 import axios from 'axios';
@@ -7,7 +7,6 @@ import axios from 'axios';
 import { MARKETPLACE_ADDRESS } from '../config.js';
 import marketplaceAbi from '../../artifacts/contracts/Marketplace.sol/Marketplace.json';
 
-// --- NEW ---
 // Import the new modal component
 import WalletConnectModal from '../components/WalletConnectModal';
 
@@ -26,9 +25,21 @@ export const AppProvider = ({ children }) => {
     const [provider, setProvider] = useState(null);
     const [marketplaceContract, setMarketplaceContract] = useState(null);
 
-    // --- NEW ---
     // State to control the wallet connection modal
     const [isWalletModalOpen, setIsWalletModalOpen] = useState(false);
+
+    // Wrap logout in useCallback
+    const logout = useCallback(() => {
+        setCurrentUser(null);
+        setToken(null);
+        setAccount(null);
+        setProvider(null);
+        setMarketplaceContract(null);
+        setIsWalletModalOpen(false);
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('token');
+        toast.success("You have been logged out.");
+    }, []);
 
     // --- Effects ---
 
@@ -43,9 +54,6 @@ export const AppProvider = ({ children }) => {
                 setToken(storedToken);
                 setCurrentUser(parsedUser);
 
-                // --- NEW ---
-                // If user is loaded from storage but has no wallet, show modal.
-                // Note: The user might have a wallet in MetaMask but not saved in our DB.
                 if (!parsedUser.wallet) {
                     setIsWalletModalOpen(true);
                 }
@@ -76,26 +84,100 @@ export const AppProvider = ({ children }) => {
         fetchEvents();
     }, []);
 
-    // --- NEW ---
+
+    // This effect runs on page load to auto-connect an existing wallet
+    useEffect(() => {
+        const autoConnectWallet = async () => {
+            if (window.ethereum) {
+                try {
+                    // Check if MetaMask is already connected to this site
+                    const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+
+                    if (accounts.length > 0) {
+                        // An account is already authorized
+                        const address = accounts[0];
+                        
+                        // Check if the connected account matches the logged-in user
+                        const storedUser = localStorage.getItem('currentUser');
+                        if (storedUser) {
+                            const parsedUser = JSON.parse(storedUser);
+                            if (parsedUser.wallet && parsedUser.wallet.toLowerCase() !== address.toLowerCase()) {
+                                // Mismatch! The user is logged in, but their active MetaMask
+                                // account is not the one associated with their profile.
+                                toast.warn("Active wallet doesn't match your profile. Logging out.");
+                                logout();
+                                return;
+                            }
+                        }
+
+                        // Set up the provider and contract state
+                        const web3Provider = new ethers.BrowserProvider(window.ethereum);
+                        const signer = await web3Provider.getSigner();
+                        const marketplace = new ethers.Contract(MARKETPLACE_ADDRESS, marketplaceAbi.abi, signer);
+                        
+                        setProvider(web3Provider);
+                        setAccount(address);
+                        setMarketplaceContract(marketplace);
+                    }
+                    // If accounts.length is 0, do nothing. The user is not connected.
+                } catch (error) {
+                    console.error("Failed to auto-connect wallet:", error);
+                }
+            }
+        };
+
+        autoConnectWallet();
+    }, [logout]); // Depends on 'logout' (which is memoized)
+
+    // Add a listener for MetaMask account changes
+    useEffect(() => {
+        if (window.ethereum) {
+            const handleAccountsChanged = (accounts) => {
+                if (accounts.length === 0) {
+                    // --- User disconnected their wallet ---
+                    toast.error("Wallet disconnected. Please reconnect.");
+                    // Clear blockchain state
+                    setAccount(null);
+                    setProvider(null);
+                    setMarketplaceContract(null);
+                    // Show the modal
+                    if (currentUser) {
+                         setIsWalletModalOpen(true);
+                    }
+                } else if (account && accounts[0].toLowerCase() !== account.toLowerCase()) {
+                    // --- User switched to a different account ---
+                    toast.warn("Wallet account changed. Logging out for security.");
+                    logout(); // This is correct, force logout on account switch
+                }
+            };
+
+            window.ethereum.on('accountsChanged', handleAccountsChanged);
+
+            return () => {
+                window.ethereum.removeListener('accountsChanged', handleAccountsChanged);
+            };
+        }
+    }, [account, logout, currentUser]);
+
+
     // Function to save the wallet address to the backend
     const saveWalletAddress = async (walletAddress) => {
         const token = localStorage.getItem('token');
         if (!token) {
             toast.error("Authentication session expired. Please log in again.");
-            logout(); // Log them out if token is missing
+            logout(); 
             return false;
         }
 
         const toastId = toast.loading("Saving wallet address to profile...");
         try {
-            // As requested: PUT call to the auth module
             const response = await axios.put('http://localhost:3001/auth/wallet', 
                 { walletAddress },
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
 
+            // Based on our discussion, service returns { user: userPayload }
             if (response.data && response.data.user) {
-                // Backend returns the updated user object
                 const updatedUser = response.data.user;
                 setCurrentUser(updatedUser);
                 localStorage.setItem('currentUser', JSON.stringify(updatedUser));
@@ -112,29 +194,29 @@ export const AppProvider = ({ children }) => {
     };
 
 
-    // --- Wallet & Blockchain Functions ---
-    // --- MODIFIED ---
+    // Wallet & Blockchain Functions
     const connectWallet = async () => {
         if (!window.ethereum) {
             toast.error("Please install MetaMask to use blockchain features!");
             return;
         }
         try {
+            // This line *prompts* the user to connect
+            await window.ethereum.request({ method: 'eth_requestAccounts' });
+
             const web3Provider = new ethers.BrowserProvider(window.ethereum);
-            await web3Provider.send("eth_requestAccounts", []);
+            // await web3Provider.send("eth_requestAccounts", []);
             const signer = await web3Provider.getSigner();
             const address = await signer.getAddress();
             
             setProvider(web3Provider);
             setAccount(address);
 
-            // Instantiate the one central marketplace contract
             const marketplace = new ethers.Contract(MARKETPLACE_ADDRESS, marketplaceAbi.abi, signer);
             setMarketplaceContract(marketplace);
 
             toast.success(`Wallet connected: ${address.slice(0, 6)}...${address.slice(-4)}`);
 
-            // --- NEW LOGIC ---
             // If the user is logged in but doesn't have a wallet saved, save it.
             if (currentUser && !currentUser.wallet) {
                 const saveSuccess = await saveWalletAddress(address);
@@ -143,6 +225,9 @@ export const AppProvider = ({ children }) => {
                 } else {
                     toast.error("Wallet connected, but failed to save. Please try again.");
                 }
+            } else if (currentUser && currentUser.wallet) {
+                // If they are just re-connecting, close the modal
+                setIsWalletModalOpen(false);
             }
 
         } catch (error) {
@@ -151,8 +236,7 @@ export const AppProvider = ({ children }) => {
         }
     };
 
-    // --- API & User Management Functions ---
-    // --- MODIFIED ---
+    // API & User Management Functions
     const login = async (email, password) => {
         try {
             const response = await axios.post('http://localhost:3001/auth/login', { email, password });
@@ -163,8 +247,6 @@ export const AppProvider = ({ children }) => {
             setToken(token);
             setCurrentUser(user);
 
-            // --- NEW ---
-            // Check if the user needs to connect their wallet
             if (!user.wallet) {
                 setIsWalletModalOpen(true);
             }
@@ -196,20 +278,7 @@ export const AppProvider = ({ children }) => {
             return { success: false, message: error.response?.data?.error };
         }
     };
-
-    // --- MODIFIED ---
-    const logout = () => {
-        setCurrentUser(null);
-        setToken(null);
-        setAccount(null);
-        setProvider(null);
-        setMarketplaceContract(null);
-        setIsWalletModalOpen(false); // --- NEW --- Close modal on logout
-        localStorage.removeItem('currentUser');
-        localStorage.removeItem('token');
-        toast.success("You have been logged out.");
-    };
-
+    
     // Universal message display function
     const showMessage = (message, type = 'info') => {
         switch (type) {
@@ -237,23 +306,17 @@ export const AppProvider = ({ children }) => {
         setSelectedEvent,
         account,
         provider,
-        connectWallet, // This is the updated connectWallet
+        connectWallet,
         marketplaceContract,
         login,
         logout,
         register,
         showMessage,
-        // Note: We don't need to export isWalletModalOpen or saveWalletAddress
-        // because this context manages it internally.
     };
 
     return (
         <AppContext.Provider value={value}>
             {children}
-            
-            {/* --- NEW --- */}
-            {/* This will render the modal on top of all other {children} 
-                when isWalletModalOpen is true */}
             {isWalletModalOpen && <WalletConnectModal />}
         </AppContext.Provider>
     );
