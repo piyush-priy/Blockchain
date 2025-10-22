@@ -1,7 +1,33 @@
-Database schema:
 
-Table Users (id, createdAt, updatedAt, firstName, lastName, email, password, role, walletAddress)
-Table Organisers (id, createdAt, updatedAt, organizerName(firstName), companyName(lastName), email, password, role, organizerWalletAddress)
-Table events (//something)
-Table tickets (//something)
+Database schema:
+Table Users (id, createdAt, updatedAt, firstName, lastName, email, password, role, walletAddress, createdEvents[])
+Table events (id, name, date, venue, status, maxResaleCount, priceCap, description, posterUrl, seatLayout, type, contractAddress, organizerId, organizer, tickets[])
+Table tickets (id, tokenId, eventId, metadataUri, ownerWallet, status, purchasePrice, event{})
+
+Frontend Fixes :
+[ DONE ] Fix missing API call to GET http://localhost:3001/tickets/my-tickets
+Track ticket ownership and status change - Complex frontend logic
+[ DONE ] Add ticket burning functionality
+[ DONE ] Display seat number in tickets
+[ DONE ] Display entire ticket instead of QR, add option to download tickets
+Admin dashboard updation
+
+Broken API Endpoints
+[ DONE ] GET http://localhost:3001/events/${event.id}/unavailable-seats
+[ XX - DEPRECATED - XX ] POST http://localhost:3001/metadata/temp
+[ DONE ] GET http://localhost:3001/events/organizer/${user.id}
+
+QOL improvements :
+Enhance error messages in toast popup
+Enhance frontend UI/UX (Refine all pages into consistent professional design)
+Default AI generated placeholder banner with app advert ( src/assets/default_event_banner.png )
+[ DONE ] Fix wallet disconnection on reload bug
+Make Event Banner url optional for organizers
+
+UI / UX fixes and improvements :
+Secondary Marketplace Page - Section for 'tickets listed by me' and others
+User Profile Page - 'My Profile' section and 'My Tickets' section
+Create Hero Page for products / services info
+
+
 

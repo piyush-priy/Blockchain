@@ -1,6 +1,6 @@
 import React from 'react';
 
-const NftTicketCard = ({ tokenId, metadata, actions }) => {
+const NftTicketCard = ({ tokenId, metadata, actions, seatIdentifier }) => {
     // Safely extract attributes from metadata
     const attributes = metadata?.attributes || [];
     const findAttr = (trait_type) => attributes.find(a => a.trait_type === trait_type)?.value || 'N/A';
@@ -35,6 +35,10 @@ const NftTicketCard = ({ tokenId, metadata, actions }) => {
                         <span className={`font-semibold capitalize ${ticketStatus === 'used' ? 'text-red-400' : 'text-green-400'}`}>
                             {ticketStatus}
                         </span>
+                    </div>
+                    <div className="flex justify-between">
+                        <span className="text-gray-400">Seat:</span>
+                        <span className="text-white font-semibold">{seatIdentifier || 'N/A'}</span>
                     </div>
                 </div>
 

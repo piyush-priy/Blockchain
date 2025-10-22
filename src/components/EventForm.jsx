@@ -3,8 +3,10 @@ import { ethers } from 'ethers';
 import toast from 'react-hot-toast'; // **THE FIX IS HERE**: Added the missing import for toast notifications.
 import { AppContext } from '../context/AppContext';
 import LayoutCreator from './LayoutCreator';
-import { TICKET_NFT_FACTORY_ADDRESS } from '../config.js';
+
+import { TICKET_NFT_FACTORY_ADDRESS, MARKETPLACE_ADDRESS } from '../config.js';
 import TicketNFTFactory from '../../artifacts/contracts/TicketNFTFactory.sol/TicketNFTFactory.json';
+import TicketNFT from '../../artifacts/contracts/TicketNFT.sol/TicketNFT.json';
 
 const EventForm = ({ onEventCreated }) => {
     const { provider, showMessage, currentUser } = useContext(AppContext);
@@ -54,7 +56,7 @@ const EventForm = ({ onEventCreated }) => {
                 try {
                     const parsedLog = factoryContract.interface.parseLog(log);
                     if (parsedLog && parsedLog.name === "EventContractCreated") {
-                        newContractAddress = parsedLog.args.newContractAddress;
+                        newContractAddress = parsedLog.args.eventContract;
                         break;
                     }
                 } catch (error) {
@@ -66,7 +68,16 @@ const EventForm = ({ onEventCreated }) => {
                 throw new Error("Could not find EventContractCreated event in transaction receipt.");
             }
             
-            toast.loading("Contract deployed! Saving event details...", { id: toastId });
+            toast.loading("Contract deployed! Setting marketplace address...", { id: toastId });
+
+            // Instantiate the newly deployed contract
+            const newEventContract = new ethers.Contract(newContractAddress, TicketNFT.abi, signer);
+
+            // Call its 'setMarketplaceAddress' function
+            const setMarketplaceTx = await newEventContract.setMarketplaceAddress(MARKETPLACE_ADDRESS);
+            await setMarketplaceTx.wait();
+
+            toast.loading("Marketplace set! Saving event details to database...", { id: toastId });
 
             const token = localStorage.getItem('token');
             const response = await fetch('http://localhost:3001/events', {

@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 interface ITicketNFT {
     function ownerOf(uint256 tokenId) external view returns (address);
     function transferFrom(address from, address to, uint256 tokenId) external;
+    function updateTicketSale(uint256 tokenId, uint256 price) external;
 }
 
 contract Marketplace is Ownable {
@@ -17,6 +18,7 @@ contract Marketplace is Ownable {
         address seller;
         address nftContract; // The specific contract for this event's tickets
         uint256 price;
+        uint256 tokenId;
     }
 
     // Mapping from a unique listing ID to the Listing details
@@ -57,17 +59,19 @@ contract Marketplace is Ownable {
         listings[listingId] = Listing({
             seller: msg.sender,
             nftContract: nftContract,
-            price: price
+            price: price,
+            tokenId: tokenId
         });
 
         emit TicketListed(listingId, tokenId, nftContract, msg.sender, price);
     }
 
-    function buyTicket(uint256 listingId, uint256 tokenId) external payable {
+    function buyTicket(uint256 listingId) external payable {
         Listing storage listing = listings[listingId];
         require(listing.price > 0, "Marketplace: Ticket not listed for sale");
         require(msg.value >= listing.price, "Marketplace: Insufficient ETH sent");
 
+        uint256 tokenId = listing.tokenId;
         address seller = listing.seller;
         address nftContract = listing.nftContract;
         uint256 price = listing.price;
@@ -89,13 +93,17 @@ contract Marketplace is Ownable {
         // Transfer the NFT from the marketplace to the buyer
         ITicketNFT(nftContract).transferFrom(address(this), msg.sender, tokenId);
 
+        ITicketNFT(nftContract).updateTicketSale(tokenId, price);
+        
         emit TicketSold(listingId, tokenId, nftContract, msg.sender, price);
     }
 
-    function unlistTicket(uint256 listingId, uint256 tokenId) external {
+    function unlistTicket(uint256 listingId) external {
         Listing storage listing = listings[listingId];
         require(listing.seller == msg.sender, "Marketplace: You are not the seller");
 
+        // Get the tokenId from the struct
+        uint256 tokenId = listing.tokenId; 
         address nftContract = listing.nftContract;
         
         // Clear the listing

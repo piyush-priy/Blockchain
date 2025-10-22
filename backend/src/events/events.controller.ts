@@ -6,10 +6,12 @@ import {
   Delete,
   Param,
   Body,
+  Req,
   UseGuards,
   BadRequestException,
-  NotFoundException,
+  ForbiddenException,
   InternalServerErrorException,
+  ParseIntPipe,
 } from '@nestjs/common';
 import { EventsService } from './events.service';
 import { CreateEventDto } from './dto/create-event.dto';
@@ -24,15 +26,17 @@ export class EventsController {
 
   // --- Create Event (Organizer Only) ---
   @UseGuards(JwtAuthGuard, RolesGuard)
-  @Roles('organizer')
+  // @Roles('organizer')
   @Post()
-  async createEvent(@Body() dto: CreateEventDto) {
+  async createEvent(@Body() dto: CreateEventDto, @Req() req: any) {
     if (!dto.name || !dto.date || !dto.venue || !dto.type || !dto.description || !dto.posterUrl) {
       throw new BadRequestException(
         'Missing required fields: name, date, venue, type, description, posterUrl.'
       );
     }
-    return this.eventsService.createEvent(dto);
+    const organizerId = req.user.id;
+    console.log('Creating event for organizer ID:', organizerId);
+    return this.eventsService.createEvent(dto, organizerId);
   }
 
 
@@ -43,12 +47,37 @@ export class EventsController {
   }
 
   
+  // --- Get Event by ID ---
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('organizer')
+  @Get('organizer/:id')
+  async getOrganizerEvents(@Param('id') id: string, @Req() req: any) {
+    const organizerIdParam = +id;
+    const requestingUserId = req.user.id;
+
+    // --- Security Check ---
+    // Make sure the logged-in user is not trying to access another organizer's events
+    if (organizerIdParam !== requestingUserId) {
+      throw new ForbiddenException("You are not authorized to view these events.");
+    }
+
+    return this.eventsService.getEventsByOrganizer(requestingUserId);
+  }
+
+
   // --- Update Event (Organizer Only) ---
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('organizer')
   @Put(':id')
   async updateEvent(@Param('id') id: string, @Body() dto: UpdateEventDto) {
     return this.eventsService.updateEvent(+id, dto);
+  }
+
+
+  // --- Get Unavailable Seats for Event ---
+  @Get(':id/unavailable-seats')
+  async getUnavailableSeats(@Param('id', ParseIntPipe) eventId: number) {
+    return this.eventsService.getUnavailableSeats(eventId);
   }
 
 

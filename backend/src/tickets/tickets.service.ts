@@ -1,7 +1,8 @@
-import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException } from '@nestjs/common';
+import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
 import { CreateTicketDto } from './dto/create-ticket.dto';
+import { ConfirmBurnDto } from './dto/confirm-burn.dto';
 
 
 @Injectable()
@@ -33,6 +34,7 @@ export class TicketsService {
                 metadataUri: dto.metadataUri,
                 ownerWallet: dto.ownerWallet.toLowerCase(),
                 purchasePrice: dto.purchasePrice,
+                seatIdentifier: dto.seatInfo,
                 },
             });
         } catch (err) {
@@ -61,7 +63,7 @@ export class TicketsService {
     }
 
 
-    //Mark ticket as used
+    //Mark ticket as used (Only for Admin)
     async markTicketUsed(tokenId: number) {
         try {
             const ticket = await this.prisma.tickets.findUnique({ where: { tokenId } });
@@ -115,7 +117,7 @@ export class TicketsService {
         const ticket = await this.prisma.tickets.findFirst({
             where: {
             tokenId,
-            event: { contractAddress: contractAddress.toLowerCase() },
+            event: { contractAddress: contractAddress },
             },
             include: { event: true },
         });
@@ -142,6 +144,86 @@ export class TicketsService {
     }
 
 
+    // Validate ticket for burning before allowing burn on blockchain
+    async validateTicketForBurn(tokenId: number, contractAddress: string, requestingUserId: number) {
+        try {
+            const ticket = await this.prisma.tickets.findFirst({
+                where: {
+                    tokenId,
+                    event: { contractAddress: contractAddress },
+                },
+                include: { // Include event data to check the organizer
+                    event: true,
+                },
+            });
+
+            if (!ticket) {
+                throw new NotFoundException('Ticket not found for this event contract.');
+            }
+
+            // Security Check: Is the person scanning the ticket the organizer of this event?
+            if (ticket.event.organizerId !== requestingUserId) {
+                throw new ForbiddenException('You are not authorized to burn tickets for this event.');
+            }
+
+            if (ticket.status === 'used') {
+                throw new BadRequestException('Ticket has already been used/burned.');
+            }
+
+            // If all checks pass, return true or some success indicator
+            return true;
+
+        } catch (err) {
+            // Re-throw specific exceptions
+            if (err instanceof NotFoundException || err instanceof BadRequestException || err instanceof ForbiddenException) {
+                throw err;
+            }
+            // Log unexpected errors
+            console.error("Error validating ticket for burn:", err);
+            throw new InternalServerErrorException('Failed to validate ticket.');
+        }
+    }
+
+    // Confirm ticket burn after successful blockchain transaction
+    async confirmTicketBurn(dto: ConfirmBurnDto) {
+        try {
+            // Find the specific ticket using tokenId AND the event's contractAddress
+            const ticket = await this.prisma.tickets.findFirst({
+                where: {
+                    tokenId: dto.tokenId,
+                    event: { contractAddress: dto.contractAddress },
+                },
+            });
+
+            if (!ticket) {
+                throw new NotFoundException('Ticket not found for the specified event contract.');
+            }
+
+            // Update the status only if it's not already 'used'
+            if (ticket.status === 'used') {
+                // Return success even if already marked, avoids unnecessary errors
+                return { message: 'Ticket status already confirmed as used.' };
+            }
+
+            await this.prisma.tickets.update({
+                where: {
+                    // Use the unique ticket ID (primary key) for the update
+                    id: ticket.id,
+                },
+                data: { status: 'used' },
+            });
+
+            return { message: `Ticket ${dto.tokenId} status confirmed as 'used'.` };
+
+        } catch (err) {
+            if (err instanceof NotFoundException) {
+                throw err;
+            }
+            console.error("Error confirming ticket burn:", err);
+            throw new InternalServerErrorException('Failed to confirm ticket burn status.');
+        }
+
+    }
 
 
 }

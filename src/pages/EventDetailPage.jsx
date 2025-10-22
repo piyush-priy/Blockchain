@@ -4,9 +4,20 @@ import { AppContext } from '../context/AppContext';
 import PageTitle from '../components/PageTitle';
 
 const EventDetailPage = () => {
-    const { events, setSelectedEvent } = useContext(AppContext);
+    const { events, setSelectedEvent, eventsLoading } = useContext(AppContext);
     const { eventId } = useParams();
     const navigate = useNavigate();
+
+    if (eventsLoading) {
+        return <div className="text-center py-10 text-white">Loading event...</div>;
+    }
+
+    console.log("DEBUG: Finding event...", {
+        eventIdFromUrl: eventId,
+        eventIdDataType: typeof eventId,
+        firstEventIdFromData: events[0]?.id,
+        firstEventIdDataType: typeof events[0]?.id,
+    });
 
     const event = events.find(e => e.id.toString() === eventId);
     

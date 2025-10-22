@@ -1,11 +1,12 @@
-import { IsNotEmpty, IsOptional, IsString, IsInt } from 'class-validator';
+import { IsNotEmpty, IsOptional, IsString, IsInt, IsObject, IsDateString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class CreateEventDto {
   @IsString()
   @IsNotEmpty()
   name: string;
 
-  @IsString()
+  @IsDateString()
   @IsNotEmpty()
   date: string;
 
@@ -13,26 +14,42 @@ export class CreateEventDto {
   @IsNotEmpty()
   venue: string;
 
+  @IsOptional()
   @IsString()
-  @IsNotEmpty()
-  description: string;
-
-  @IsString()
-  @IsNotEmpty()
-  posterUrl: string;
-
-  @IsString()
-  @IsNotEmpty()
-  type: string;
+  status?: string; // defaults to "Pending" in DB
 
   @IsOptional()
-  seatLayout?: any;
-
-  @IsOptional()
+  @Type(() => Number)
   @IsInt()
-  maxResaleCount?: number;
+  maxResaleCount?: number; // defaults to 3
 
   @IsOptional()
+  @Type(() => Number)
   @IsInt()
-  priceCap?: number;
+  priceCap?: number; // defaults to 120
+
+  @IsOptional()
+  @IsString()
+  description?: string;
+
+  @IsOptional()
+  @IsString()
+  posterUrl?: string;
+
+  @IsOptional()
+  @IsObject()
+  seatLayout?: Record<string, any>;
+
+  @IsOptional()
+  @IsString()
+  type?: string;
+
+  @IsOptional()
+  @IsString()
+  contractAddress?: string;
+
+  @IsOptional()
+  @Type(() => Number)
+  @IsInt()
+  organizerId: number;
 }
