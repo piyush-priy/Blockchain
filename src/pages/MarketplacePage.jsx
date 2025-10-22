@@ -7,7 +7,7 @@ import TicketNFT from '../../artifacts/contracts/TicketNFT.sol/TicketNFT.json';
 import { MARKETPLACE_ADDRESS } from '../config';
 
 const MarketplacePage = () => {
-    const { provider, showMessage } = useContext(AppContext);
+    const { provider, showMessage, currentUser:user } = useContext(AppContext);
     const [listedTickets, setListedTickets] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -78,27 +78,56 @@ const MarketplacePage = () => {
         fetchListedTickets();
     }, [provider, showMessage]);
 
+    
     const handleBuyTicket = async (ticket) => {
-        if (!provider) {
+        if (!provider || !user || !user.wallet) {
             showMessage("Please connect your wallet.", "error");
             return;
         }
-        showMessage("Processing purchase...", "info");
+        const toastId = showMessage("Processing purchase...", "loading");
+        
         try {
             const signer = await provider.getSigner();
             const marketplaceContract = new ethers.Contract(MARKETPLACE_ADDRESS, Marketplace.abi, signer);
 
-            const tx = await marketplaceContract.buyTicket(ticket.nftContract, ticket.tokenId, { value: ticket.price });
+            // 1. Blockchain Transaction
+            const tx = await marketplaceContract.buyTicket(ticket.listingId, { value: ticket.price });
+            showMessage("Waiting for transaction confirmation...", { id: toastId, type: 'loading' });
             await tx.wait();
 
-            showMessage("Purchase successful! The ticket is now in your wallet.", "success");
-            // Refresh the list after purchase
+            showMessage("Updating ticket ownership in database...", { id: toastId, type: 'loading' });
+
+            // 2. Call Backend to Update Owner
+            const token = localStorage.getItem('token');
+            const updateResponse = await fetch('http://localhost:3001/tickets/update-owner', {
+                method: 'PATCH',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    tokenId: Number(ticket.tokenId),
+                    contractAddress: ticket.nftContract,
+                    newOwnerWallet: user.wallet // The new buyer's wallet
+                })
+            });
+
+            if (!updateResponse.ok) {
+                 // Log error but don't fail the entire process
+                console.error("Failed to update owner in backend:", await updateResponse.text());
+                showMessage("Purchase complete, but backend update failed.", { id: toastId, type: 'error' });
+            } else {
+                showMessage("Purchase successful! Ticket ownership updated.", { id: toastId, type: 'success' });
+            }
+
+            // Refresh the marketplace list
             setListedTickets(prev => prev.filter(t => t.listingId.toString() !== ticket.listingId.toString()));
 
         } catch (error) {
             console.error("Purchase failed:", error);
-            showMessage(error.reason || "Purchase failed.", "error");
+            showMessage(error.reason || "Purchase failed.", { id: toastId, type: 'error' });
         }
+
     };
 
     if (loading) return <p className="text-center">Loading marketplace...</p>;

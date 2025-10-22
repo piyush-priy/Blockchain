@@ -280,18 +280,41 @@ export const AppProvider = ({ children }) => {
     };
     
     // Universal message display function
-    const showMessage = (message, type = 'info') => {
-        switch (type) {
-            case 'success':
-                toast.success(message);
-                break;
-            case 'error':
-                toast.error(message);
-                break;
-            case 'loading':
-                return toast.loading(message);
-            default:
-                toast(message);
+    const showMessage = (message, options) => {
+        // If 'options' is an object containing an 'id', we update that toast.
+        if (typeof options === 'object' && options !== null && options.id !== undefined) {
+            const { id, type = 'info' } = options; // Default to 'info' if type is missing
+
+            switch (type) {
+                case 'success':
+                    toast.success(message, { id: id }); // Use the provided id
+                    break;
+                case 'error':
+                    toast.error(message, { id: id }); // Use the provided id
+                    break;
+                case 'loading':
+                    toast.loading(message, { id: id }); // Use the provided id
+                    break;
+                default: // 'info' or any other type
+                    toast(message, { id: id }); // Use the provided id
+            }
+        }
+        // Otherwise, if options is just a string (the old way) or missing, create a new toast.
+        else {
+            const type = typeof options === 'string' ? options : 'info'; // Handle string type or default
+            switch (type) {
+                case 'success':
+                    toast.success(message);
+                    break;
+                case 'error':
+                    toast.error(message);
+                    break;
+                case 'loading':
+                    // When creating a loading toast, RETURN the id
+                    return toast.loading(message);
+                default:
+                    toast(message);
+            }
         }
     };
     

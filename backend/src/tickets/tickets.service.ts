@@ -1,8 +1,7 @@
 import { Injectable, InternalServerErrorException, BadRequestException, NotFoundException, ForbiddenException } from '@nestjs/common';
 import { PrismaClientKnownRequestError } from '@prisma/client/runtime/library';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { CreateTicketDto } from './dto/create-ticket.dto';
-import { ConfirmBurnDto } from './dto/confirm-burn.dto';
+import { CreateTicketDto, ConfirmBurnDto, UpdateOwnerDto } from './dto';
 
 
 @Injectable()
@@ -141,6 +140,45 @@ export class TicketsService {
             throw new InternalServerErrorException('Failed to fetch ticket metadata.');
         }
   
+    }
+
+
+    // Update ticket owner after transfer on blockchain from frontend
+    async updateTicketOwner(dto: UpdateOwnerDto) {
+        try {
+            // Find the specific ticket using tokenId AND the event's contractAddress
+            const ticket = await this.prisma.tickets.findFirst({
+                where: {
+                    tokenId: dto.tokenId,
+                    event: { contractAddress: dto.contractAddress },
+                },
+                select: { id: true }
+            });
+
+            if (!ticket) {
+                // Important: Don't throw an error if not found.
+                // It's possible the ticket was minted outside the app
+                // and doesn't exist in our DB. Log it instead.
+                console.warn(`Ticket (TokenID: ${dto.tokenId}, Contract: ${dto.contractAddress}) not found in DB during owner update.`);
+                return { message: 'Ticket not found in local database, but ownership likely updated on-chain.' };
+            }
+
+            // Update the ownerWallet in the database
+            await this.prisma.tickets.update({
+                where: {
+                    id: ticket.id, // Use the primary key
+                },
+                data: { ownerWallet: dto.newOwnerWallet.toLowerCase() },
+            });
+
+            return { message: `Ticket ${dto.tokenId} owner updated in database.` };
+
+        } catch (err) {
+            console.error("Error updating ticket owner in DB:", err);
+            // Don't throw an error to the frontend if the DB update fails,
+            // as the on-chain transfer already succeeded. Log it.
+             return { message: 'On-chain transfer successful, but failed to update local database owner.' };
+        }
     }
 
 
