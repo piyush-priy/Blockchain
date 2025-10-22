@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   UseGuards,
@@ -12,8 +13,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { TicketsService } from './tickets.service';
-import { CreateTicketDto } from './dto/create-ticket.dto';
-import { ConfirmBurnDto } from './dto/confirm-burn.dto';
+import { CreateTicketDto, UpdateOwnerDto, ConfirmBurnDto } from './dto';
 import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
@@ -63,6 +63,13 @@ export class TicketsController {
     return this.ticketsService.getTicketMetadata(tokenId, contractAddress);
   }
 
+
+  @UseGuards(JwtAuthGuard)
+  @Patch('update-owner')
+  @HttpCode(HttpStatus.OK)
+  async updateOwner(@Body() updateOwnerDto: UpdateOwnerDto) {
+    return this.ticketsService.updateTicketOwner(updateOwnerDto);
+  }
 
   @UseGuards(JwtAuthGuard, RolesGuard)
   @Roles('organizer', 'admin')
