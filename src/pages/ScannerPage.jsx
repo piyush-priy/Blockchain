@@ -1,4 +1,4 @@
-import React, { useState, useContext, useRef } from 'react';
+import React, { useState, useContext, useRef, useEffect } from 'react';
 // 1. Import the correct scanner component based on your file
 import { Scanner } from '@yudiel/react-qr-scanner';
 import { toast } from 'react-hot-toast';
@@ -19,6 +19,14 @@ const ScannerPage = () => {
     });
     const fileInputRef = useRef(null);
     const canvasRef = useRef(null);
+    const [scannerError, setScannerError] = useState(null);
+
+    useEffect(() => {
+        if (scannerError) {
+            console.error("Scanner initialization failed:", scannerError);
+            toast.error("Camera access failed. You can try uploading an image instead.", { duration: 5000 });
+        }
+    }, [scannerError]);
 
     const openFilePicker = () => fileInputRef.current?.click();
 
@@ -259,7 +267,7 @@ const ScannerPage = () => {
             </div>
 
             {/* Upload alternative */}
-            <div className="mt-4 w-full max-w-md flex items-center justify-center gap-3">
+            <div className="mt-4 w-full max-w-md flex items-center justify-center gap-3 relative z-10">
                 <input
                     ref={fileInputRef}
                     type="file"
@@ -271,7 +279,7 @@ const ScannerPage = () => {
                 <button
                     type="button"
                     onClick={openFilePicker}
-                    className="bg-gray-700 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded-md"
+                    className="bg-gray-700 hover:bg-gray-600 text-white font-semibold px-4 py-2 rounded-md relative z-50"
                 >
                     Upload Ticket Image
                 </button>
