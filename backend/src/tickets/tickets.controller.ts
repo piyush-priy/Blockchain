@@ -21,7 +21,7 @@ import type { Request } from 'express';
 
 @Controller('tickets')
 export class TicketsController {
-  constructor(private readonly ticketsService: TicketsService) {}
+  constructor(private readonly ticketsService: TicketsService) { }
 
   @UseGuards(JwtAuthGuard)
   @Get('my-tickets')
@@ -52,8 +52,8 @@ export class TicketsController {
     @Param('tokenId') tokenId: number,
     @Param('contractAddress') contractAddress: string,
   ) {
-      return this.ticketsService.getTicketStatus(tokenId, contractAddress);
-    }
+    return this.ticketsService.getTicketStatus(tokenId, contractAddress);
+  }
 
   @Get('/metadata/:tokenId/:contractAddress')
   async getTicketMetadata(

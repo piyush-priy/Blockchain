@@ -212,4 +212,3 @@ const SeatSelectionPage = () => {
 };
 
 export default SeatSelectionPage;
-

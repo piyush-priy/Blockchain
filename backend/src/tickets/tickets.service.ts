@@ -6,7 +6,7 @@ import { CreateTicketDto, ConfirmBurnDto, UpdateOwnerDto } from './dto';
 
 @Injectable()
 export class TicketsService {
-    constructor(private prisma : PrismaService) {}
+    constructor(private prisma: PrismaService) { }
 
     async getTicketsByWallet(wallet: string) {
         try {
@@ -24,16 +24,16 @@ export class TicketsService {
     }
 
 
-    async createTicket(dto : CreateTicketDto) {
+    async createTicket(dto: CreateTicketDto) {
         try {
             return await this.prisma.tickets.create({
                 data: {
-                tokenId: dto.tokenId,
-                eventId: dto.eventId,
-                metadataUri: dto.metadataUri,
-                ownerWallet: dto.ownerWallet.toLowerCase(),
-                purchasePrice: dto.purchasePrice,
-                seatIdentifier: dto.seatInfo,
+                    tokenId: dto.tokenId,
+                    eventId: dto.eventId,
+                    metadataUri: dto.metadataUri,
+                    ownerWallet: dto.ownerWallet.toLowerCase(),
+                    purchasePrice: dto.purchasePrice,
+                    seatIdentifier: dto.seatInfo,
                 },
             });
         } catch (err) {
@@ -113,33 +113,33 @@ export class TicketsService {
     //Get metadata for NFT ticket
     async getTicketMetadata(tokenId: number, contractAddress: string) {
         try {
-        const ticket = await this.prisma.tickets.findFirst({
-            where: {
-            tokenId,
-            event: { contractAddress: contractAddress },
-            },
-            include: { event: true },
-        });
+            const ticket = await this.prisma.tickets.findFirst({
+                where: {
+                    tokenId,
+                    event: { contractAddress: contractAddress },
+                },
+                include: { event: true },
+            });
 
-        if (!ticket) throw new NotFoundException('Ticket not found for this event.');
+            if (!ticket) throw new NotFoundException('Ticket not found for this event.');
 
-        const e = ticket.event;
-        return {
-            name: `Ticket for ${e.name} - #${ticket.tokenId}`,
-            description: `This NFT is a ticket for ${e.name} at ${e.venue} on ${e.date}.`,
-            image:
-            'https://via.placeholder.com/500/FF0000/FFFFFF?text=EVENT+TICKET',
-            attributes: [
-            { trait_type: 'Event', value: e.name },
-            { trait_type: 'Date', value: e.date },
-            { trait_type: 'Venue', value: e.venue },
-            ],
-        };
+            const e = ticket.event;
+            return {
+                name: `Ticket for ${e.name} - #${ticket.tokenId}`,
+                description: `This NFT is a ticket for ${e.name} at ${e.venue} on ${e.date}.`,
+                image:
+                    'https://via.placeholder.com/500/FF0000/FFFFFF?text=EVENT+TICKET',
+                attributes: [
+                    { trait_type: 'Event', value: e.name },
+                    { trait_type: 'Date', value: e.date },
+                    { trait_type: 'Venue', value: e.venue },
+                ],
+            };
         } catch (err) {
             if (err instanceof NotFoundException) throw err;
             throw new InternalServerErrorException('Failed to fetch ticket metadata.');
         }
-  
+
     }
 
 
@@ -177,7 +177,7 @@ export class TicketsService {
             console.error("Error updating ticket owner in DB:", err);
             // Don't throw an error to the frontend if the DB update fails,
             // as the on-chain transfer already succeeded. Log it.
-             return { message: 'On-chain transfer successful, but failed to update local database owner.' };
+            return { message: 'On-chain transfer successful, but failed to update local database owner.' };
         }
     }
 

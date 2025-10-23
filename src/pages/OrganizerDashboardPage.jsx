@@ -1,13 +1,14 @@
 import React, { useState, useEffect, useContext } from 'react';
 import { ethers } from 'ethers';
 import { AppContext } from '../context/AppContext';
+import './organizer-dashboard.css';
 import PageTitle from '../components/PageTitle';
 import EventForm from '../components/EventForm';
 
 import TicketNFT from '../../artifacts/contracts/TicketNFT.sol/TicketNFT.json';
 
 const OrganizerDashboardPage = () => {
-    const { currentUser:user, provider, showMessage } = useContext(AppContext);
+    const { currentUser: user, provider, showMessage } = useContext(AppContext);
     const [organizerEvents, setOrganizerEvents] = useState([]);
     const [loading, setLoading] = useState(true);
     const [view, setView] = useState('dashboard');
@@ -18,15 +19,15 @@ const OrganizerDashboardPage = () => {
         try {
             const token = localStorage.getItem('token');
             const response = await fetch(`http://localhost:3001/events/organizer/${user.id}`, {
-                 headers: { 'Authorization': `Bearer ${token}` }
+                headers: { 'Authorization': `Bearer ${token}` }
             });
             console.log(response);
             if (!response.ok) throw new Error("Could not fetch organizer events.");
-            
+
             const eventsData = await response.json();
             console.log("Fetched organizer events:", eventsData);
             if (!provider) {
-                setOrganizerEvents(eventsData.map(e => ({...e, balance: '0.0'})));
+                setOrganizerEvents(eventsData.map(e => ({ ...e, balance: '0.0' })));
                 return;
             }
 
@@ -63,15 +64,15 @@ const OrganizerDashboardPage = () => {
         try {
             const signer = await provider.getSigner();
             const eventContract = new ethers.Contract(event.contractAddress, TicketNFT.abi, signer);
-            
+
             const tx = await eventContract.withdraw();
             await tx.wait();
 
             showMessage("Withdrawal successful! Funds are in your wallet.", "success");
             fetchOrganizerEvents(); // Refresh balances
         } catch (error) {
-             console.error("Withdrawal failed:", error);
-             showMessage(`Withdrawal failed: ${error.reason || error.message}`, "error");
+            console.error("Withdrawal failed:", error);
+            showMessage(`Withdrawal failed: ${error.reason || error.message}`, "error");
         }
     };
 
@@ -81,9 +82,9 @@ const OrganizerDashboardPage = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="organizer-dashboard container mx-auto px-4 py-8">
             <PageTitle title="Organizer Dashboard" />
-            
+
             <div className="mb-8 flex justify-center space-x-4">
                 <button onClick={() => setView('dashboard')} className={`px-6 py-2 font-semibold rounded-lg ${view === 'dashboard' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300'}`}>My Events</button>
                 <button onClick={() => setView('create')} className={`px-6 py-2 font-semibold rounded-lg ${view === 'create' ? 'bg-indigo-600 text-white' : 'bg-gray-700 text-gray-300'}`}>Create New Event</button>
@@ -113,8 +114,8 @@ const OrganizerDashboardPage = () => {
                                     <div className="mt-4 md:mt-0 text-center">
                                         <p className="text-gray-400 text-sm">Contract Balance</p>
                                         <p className="text-3xl font-bold text-white">{parseFloat(event.balance).toFixed(4)} ETH</p>
-                                        <button 
-                                            onClick={() => handleWithdraw(event)} 
+                                        <button
+                                            onClick={() => handleWithdraw(event)}
                                             disabled={!provider || parseFloat(event.balance) <= 0}
                                             className="mt-2 bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-md transition duration-300 disabled:bg-gray-500 disabled:cursor-not-allowed">
                                             Withdraw Funds

@@ -19,7 +19,7 @@ export const AppProvider = ({ children }) => {
     const [events, setEvents] = useState([]);
     const [selectedEvent, setSelectedEvent] = useState(null);
     const [eventsLoading, setEventsLoading] = useState(true);
-    
+
     // Blockchain-related state
     const [account, setAccount] = useState(null);
     const [provider, setProvider] = useState(null);
@@ -46,8 +46,8 @@ export const AppProvider = ({ children }) => {
     // On initial load, check for existing user session
     useEffect(() => {
         const storedToken = localStorage.getItem('token');
-        const storedUser = localStorage.getItem('currentUser'); 
-        
+        const storedUser = localStorage.getItem('currentUser');
+
         if (storedToken && storedUser) {
             try {
                 const parsedUser = JSON.parse(storedUser);
@@ -65,7 +65,7 @@ export const AppProvider = ({ children }) => {
             }
         }
     }, []);
-    
+
     // Fetch all events from the backend
     useEffect(() => {
         const fetchEvents = async () => {
@@ -96,7 +96,7 @@ export const AppProvider = ({ children }) => {
                     if (accounts.length > 0) {
                         // An account is already authorized
                         const address = accounts[0];
-                        
+
                         // Check if the connected account matches the logged-in user
                         const storedUser = localStorage.getItem('currentUser');
                         if (storedUser) {
@@ -114,7 +114,7 @@ export const AppProvider = ({ children }) => {
                         const web3Provider = new ethers.BrowserProvider(window.ethereum);
                         const signer = await web3Provider.getSigner();
                         const marketplace = new ethers.Contract(MARKETPLACE_ADDRESS, marketplaceAbi.abi, signer);
-                        
+
                         setProvider(web3Provider);
                         setAccount(address);
                         setMarketplaceContract(marketplace);
@@ -142,7 +142,7 @@ export const AppProvider = ({ children }) => {
                     setMarketplaceContract(null);
                     // Show the modal
                     if (currentUser) {
-                         setIsWalletModalOpen(true);
+                        setIsWalletModalOpen(true);
                     }
                 } else if (account && accounts[0].toLowerCase() !== account.toLowerCase()) {
                     // --- User switched to a different account ---
@@ -165,13 +165,13 @@ export const AppProvider = ({ children }) => {
         const token = localStorage.getItem('token');
         if (!token) {
             toast.error("Authentication session expired. Please log in again.");
-            logout(); 
+            logout();
             return false;
         }
 
         const toastId = toast.loading("Saving wallet address to profile...");
         try {
-            const response = await axios.put('http://localhost:3001/auth/wallet', 
+            const response = await axios.put('http://localhost:3001/auth/wallet',
                 { walletAddress },
                 { headers: { 'Authorization': `Bearer ${token}` } }
             );
@@ -208,7 +208,7 @@ export const AppProvider = ({ children }) => {
             // await web3Provider.send("eth_requestAccounts", []);
             const signer = await web3Provider.getSigner();
             const address = await signer.getAddress();
-            
+
             setProvider(web3Provider);
             setAccount(address);
 
@@ -262,13 +262,13 @@ export const AppProvider = ({ children }) => {
 
     const register = async (email, password, role, firstName, lastName, walletAddress) => {
         try {
-            await axios.post('http://localhost:3001/auth/register', { 
-                email, 
-                password, 
-                role, 
-                firstName, 
-                lastName, 
-                walletAddress 
+            await axios.post('http://localhost:3001/auth/register', {
+                email,
+                password,
+                role,
+                firstName,
+                lastName,
+                walletAddress
             });
             toast.success("Registration successful! Please log in.");
             return { success: true };
@@ -278,7 +278,7 @@ export const AppProvider = ({ children }) => {
             return { success: false, message: error.response?.data?.error };
         }
     };
-    
+
     // Universal message display function
     const showMessage = (message, options) => {
         // If 'options' is an object containing an 'id', we update that toast.
@@ -317,10 +317,10 @@ export const AppProvider = ({ children }) => {
             }
         }
     };
-    
+
     // The value provided to all consuming components
     const value = {
-        currentUser, 
+        currentUser,
         token,
         events,
         setEvents,

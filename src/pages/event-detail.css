@@ -1,0 +1,144 @@
+/* Event Detail Page - red/dark glossy theme with glass card and rich hover */
+
+.event-detail {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.event-detail::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+        radial-gradient(1200px 500px at 85% -10%, rgba(239, 68, 68, 0.18), transparent 60%),
+        radial-gradient(900px 420px at -10% 30%, rgba(190, 18, 60, 0.22), transparent 60%),
+        linear-gradient(135deg, #0a0a0b 0%, #0e0e12 40%, #111015 100%);
+}
+
+.event-detail::after {
+    content: "";
+    position: absolute;
+    inset: -5%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+/* Elevate the main card */
+.event-detail .bg-gray-800 {
+    position: relative;
+    z-index: 1;
+    background: rgba(17, 17, 24, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px) saturate(115%);
+    box-shadow:
+        0 10px 30px rgba(239, 68, 68, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: box-shadow .25s ease, transform .25s ease;
+    min-height: clamp(560px, 82vh, 920px);
+}
+
+.event-detail .bg-gray-800:hover {
+    transform: translateY(-3px);
+    box-shadow:
+        0 16px 44px rgba(239, 68, 68, 0.16),
+        0 4px 12px rgba(0, 0, 0, .45),
+        inset 0 1px 0 rgba(255, 255, 255, .06);
+}
+
+/* Glossy sheen */
+.event-detail .bg-gray-800::before {
+    content: "";
+    position: absolute;
+    top: -30%;
+    left: -20%;
+    width: 160%;
+    height: 80%;
+    transform: rotate(6deg);
+    background: linear-gradient(to bottom, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02) 35%, rgba(255, 255, 255, 0) 60%);
+    pointer-events: none;
+}
+
+/* Layout tuning */
+.event-detail .md\:flex {
+    gap: 0;
+}
+
+.event-detail .md\:flex-shrink-0 {
+    overflow: hidden;
+}
+
+.event-detail img {
+    display: block;
+    height: 100%;
+    max-height: none;
+    object-fit: cover;
+}
+
+/* Wider container but still centered */
+.event-detail.container {
+    max-width: min(1240px, 95vw);
+    padding-inline: clamp(1rem, 2vw, 2rem);
+}
+
+@media (min-width: 768px) {
+    .event-detail .md\:flex {
+        min-height: inherit;
+        align-items: stretch;
+    }
+
+    .event-detail .md\:flex-shrink-0 {
+        flex: 0 0 44%;
+    }
+
+    .event-detail .bg-gray-800 .p-8 {
+        flex: 1 1 56%;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+}
+
+/* Text contrast */
+.event-detail .text-gray-400 {
+    color: rgba(209, 213, 219, .85);
+}
+
+.event-detail .text-gray-300 {
+    color: rgba(243, 244, 246, .92);
+}
+
+/* Primary CTA -> red gradient */
+.event-detail .bg-indigo-600 {
+    background-image: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+
+.event-detail .hover\:bg-indigo-700:hover {
+    filter: brightness(1.07);
+}
+
+.event-detail .bg-indigo-600 {
+    border: 1px solid rgba(248, 113, 113, .45);
+    box-shadow: 0 10px 22px rgba(239, 68, 68, .18), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+.event-detail .bg-indigo-600:hover {
+    box-shadow: 0 12px 28px rgba(239, 68, 68, .22), inset 0 1px 0 rgba(255, 255, 255, .1);
+}
+
+/* PageTitle spacing refinement when used inside this page */
+.event-detail h1,
+.event-detail h2,
+.event-detail h3 {
+    letter-spacing: .2px;
+}
+
+/* Subtle image parallax on hover */
+.event-detail .md\:flex:hover img {
+    transform: scale(1.03);
+    transition: transform .5s ease;
+}

@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
+import './user-profile.css';
 import { ethers } from 'ethers';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'react-hot-toast';
@@ -20,7 +21,7 @@ const Modal = ({ children, onClose }) => (
 );
 
 const UserProfilePage = () => {
-    const { currentUser:user, provider, showMessage } = useContext(AppContext);
+    const { currentUser: user, provider, showMessage } = useContext(AppContext);
     const [myTickets, setMyTickets] = useState([]);
     const [loading, setLoading] = useState(true);
     const [selectedTicket, setSelectedTicket] = useState(null);
@@ -31,7 +32,7 @@ const UserProfilePage = () => {
     useEffect(() => {
         const fetchMyTickets = async () => {
             // ... (fetch logic remains the same)
-             if (!user) {
+            if (!user) {
                 setLoading(false);
                 return;
             }
@@ -74,8 +75,8 @@ const UserProfilePage = () => {
         if (!ticketRef.current || !selectedTicket) return;
 
         html2canvas(ticketRef.current, {
-             backgroundColor: '#ffffff', // Ensure background is white for PNG
-             scale: 2 // Increase scale for better resolution
+            backgroundColor: '#ffffff', // Ensure background is white for PNG
+            scale: 2 // Increase scale for better resolution
         }).then(canvas => {
             const link = document.createElement('a');
             link.download = `ticket-${selectedTicket.event.name.replace(/\s+/g, '-')}-${selectedTicket.tokenId}.png`;
@@ -138,14 +139,24 @@ const UserProfilePage = () => {
         return <div className="text-center py-20 text-white">Loading your tickets...</div>;
     }
 
+    const greetName = user?.firstName || user?.lastName || user?.email || (user?.wallet ? user.wallet.slice(0, 6) + '...' + user.wallet.slice(-4) : 'there');
+
     return (
-        <div className="container mx-auto py-8">
+        <div className="user-profile container mx-auto py-8">
+            {/* Greeting hero */}
+            <section className="up-hero">
+                <div className="up-hero-card">
+                    <h1 className="up-hero-title">Hey {greetName}, welcome back 👋</h1>
+                    <p className="up-hero-sub">Your NFT tickets live here. View your passes, show QR at the gate, or list a seat for resale with just a tap.</p>
+                </div>
+            </section>
+
             <PageTitle title="My Tickets" subtitle="Here are all the event tickets you own" />
 
             {myTickets.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                     {/* Ticket mapping remains the same */}
-                     {myTickets.map((ticket) => (
+                    {myTickets.map((ticket) => (
                         <NftTicketCard
                             key={ticket.tokenId + ticket.event.contractAddress}
                             tokenId={ticket.tokenId}
@@ -194,7 +205,7 @@ const UserProfilePage = () => {
 
                         {/* Ticket Body (content remains the same) */}
                         <div className="p-6">
-                             <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4 text-sm">
+                            <div className="grid grid-cols-2 gap-x-4 gap-y-2 mb-4 text-sm">
                                 <div>
                                     <p className="text-gray-500 font-semibold">ATTENDEE</p>
                                     <p className="font-medium text-gray-800">{user?.firstName || 'N/A'}</p>
@@ -223,7 +234,7 @@ const UserProfilePage = () => {
                                     fgColor="#000000"
                                 />
                                 <p className="text-xs text-gray-500 mt-2 font-mono">Token ID: {selectedTicket.tokenId}</p>
-                                <p className="text-xs text-gray-500 mt-1 font-mono">Contract: {selectedTicket.event.contractAddress.slice(0,6)}...{selectedTicket.event.contractAddress.slice(-4)}</p>
+                                <p className="text-xs text-gray-500 mt-1 font-mono">Contract: {selectedTicket.event.contractAddress.slice(0, 6)}...{selectedTicket.event.contractAddress.slice(-4)}</p>
                             </div>
                         </div>
                         <div className="absolute top-1/2 left-0 -mt-3 h-6 w-6 rounded-full bg-gray-800 transform -translate-x-1/2"></div>
@@ -242,7 +253,7 @@ const UserProfilePage = () => {
             {/* Sell Modal remains the same */}
             {selectedTicket && modalView === 'sell' && (
                 <Modal onClose={() => { setSelectedTicket(null); setModalView(null); setSellPrice(''); }}>
-                     <div>
+                    <div>
                         <h3 className="text-center text-2xl font-bold mb-4 text-white">Sell Your Ticket</h3>
                         <p className="text-gray-300 mb-2">Ticket for: <span className="font-semibold">{selectedTicket.event.name}</span></p>
                         <p className="text-gray-400 mb-4">Token ID: {selectedTicket.tokenId}</p>

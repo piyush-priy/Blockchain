@@ -1,4 +1,5 @@
 import React, { useContext } from 'react';
+import './event-detail.css';
 import { useParams, useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import PageTitle from '../components/PageTitle';
@@ -20,7 +21,7 @@ const EventDetailPage = () => {
     });
 
     const event = events.find(e => e.id.toString() === eventId);
-    
+
     if (!event) {
         return <div className="text-center py-10">Event not found.</div>;
     }
@@ -31,7 +32,7 @@ const EventDetailPage = () => {
     };
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="event-detail container mx-auto px-4 py-8">
             <div className="bg-gray-800 rounded-lg shadow-2xl overflow-hidden">
                 <div className="md:flex">
                     <div className="md:flex-shrink-0">

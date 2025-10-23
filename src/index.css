@@ -1,3 +1,534 @@
+/* Seat Selection page enhancements */
+@import './pages/seat-selection.css';
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/*
+	Login page modern red/dark gradient with glossy background
+	Scoped to the unique container class used on the Login page: .min-h-[calc(100vh-200px)]
+	This avoids affecting other pages and requires no JSX changes.
+*/
+
+@layer components {
+
+    /* Page background with red/dark gradients, glow particles, and vignette */
+    .min-h-\[calc\(100vh-200px\)\] {
+        position: relative;
+        isolation: isolate;
+        /* contain pseudo elements */
+        overflow: hidden;
+        /* clip decorative layers to the page area */
+        min-height: 100vh !important;
+        /* ensure full-viewport coverage */
+        width: 100% !important;
+        /* span full width, not Tailwind container */
+        max-width: none !important;
+        /* remove container max-width constraint */
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        padding-left: 0 !important;
+        /* remove container horizontal padding */
+        padding-right: 0 !important;
+        /* subtle fallback background color */
+        background-color: #0b0b0f;
+    }
+
+    .min-h-\[calc\(100vh-200px\)\]::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        /* behind content but within container */
+        background:
+            radial-gradient(1200px 500px at 80% 0%, rgba(239, 68, 68, 0.18), transparent 60%),
+            radial-gradient(1000px 400px at 10% 20%, rgba(190, 18, 60, 0.22), transparent 60%),
+            linear-gradient(135deg, #0a0a0b 0%, #0e0e12 40%, #111015 100%);
+    }
+
+    /* Soft vignette for depth */
+    .min-h-\[calc\(100vh-200px\)\]::after {
+        content: "";
+        position: absolute;
+        inset: -5%;
+        z-index: 0;
+        pointer-events: none;
+        background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.35) 100%);
+    }
+
+    /* Glassy login card inside the container (targets existing .bg-gray-800 box) */
+    .min-h-\[calc\(100vh-200px\)\] .bg-gray-800 {
+        position: relative;
+        z-index: 1;
+        /* ensure above background layers */
+        overflow: hidden;
+        background: rgba(17, 17, 24, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(14px) saturate(115%);
+        box-shadow:
+            0 10px 30px rgba(239, 68, 68, 0.12),
+            0 2px 8px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    /* Subtle glossy sheen overlay */
+    .min-h-\[calc\(100vh-200px\)\] .bg-gray-800::before {
+        content: "";
+        position: absolute;
+        top: -30%;
+        left: -20%;
+        width: 160%;
+        height: 80%;
+        transform: rotate(6deg);
+        background: linear-gradient(to bottom,
+                rgba(255, 255, 255, 0.08),
+                rgba(255, 255, 255, 0.02) 35%,
+                rgba(255, 255, 255, 0) 60%);
+        pointer-events: none;
+    }
+
+    /* Inputs refinements */
+    .min-h-\[calc\(100vh-200px\)\] input[type="email"],
+    .min-h-\[calc\(100vh-200px\)\] input[type="password"] {
+        background: rgba(22, 22, 28, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #f5f5f7;
+        transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    }
+
+    .min-h-\[calc\(100vh-200px\)\] input::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+    }
+
+    .min-h-\[calc\(100vh-200px\)\] input:focus {
+        outline: none;
+        background: rgba(26, 26, 34, 0.75);
+        border-color: rgba(248, 113, 113, 0.55);
+        /* red-400 */
+        box-shadow:
+            0 0 0 2px rgba(24, 24, 27, 0.9),
+            /* offset ring to simulate focus:ring-offset */
+            0 0 0 4px rgba(248, 113, 113, 0.45),
+            0 8px 24px rgba(220, 38, 38, 0.22);
+    }
+
+    /* Red gradient primary button (overrides existing indigo utility within this scope) */
+    .min-h-\[calc\(100vh-200px\)\] .bg-indigo-600 {
+        background-image: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    }
+
+    .min-h-\[calc\(100vh-200px\)\] .hover\:bg-indigo-700:hover {
+        filter: brightness(1.07);
+    }
+
+    .min-h-\[calc\(100vh-200px\)\] .focus\:ring-indigo-500:focus {
+        box-shadow:
+            0 0 0 3px rgba(24, 24, 27, 1),
+            0 0 0 6px rgba(248, 113, 113, 0.55) !important;
+    }
+
+    .min-h-\[calc\(100vh-200px\)\] .disabled\:bg-indigo-400:disabled {
+        background-image: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
+        opacity: 0.85;
+    }
+
+    /* Links shifted to red accent */
+    .min-h-\[calc\(100vh-200px\)\] .text-indigo-400 {
+        color: #f87171;
+        /* red-400 */
+    }
+
+    .min-h-\[calc\(100vh-200px\)\] .hover\:text-indigo-300:hover {
+        color: #fecaca;
+        /* red-200 */
+    }
+
+    /* Headings and small text tuning for better contrast */
+    .min-h-\[calc\(100vh-200px\)\] .text-gray-300 {
+        color: rgba(243, 244, 246, 0.92);
+    }
+
+    .min-h-\[calc\(100vh-200px\)\] .text-gray-400 {
+        color: rgba(209, 213, 219, 0.8);
+    }
+
+    /* Subtle card border glow on hover */
+    .min-h-\[calc\(100vh-200px\)\] .bg-gray-800:hover {
+        box-shadow:
+            0 16px 44px rgba(239, 68, 68, 0.16),
+            0 4px 12px rgba(0, 0, 0, 0.45),
+            inset 0 1px 0 rgba(255, 255, 255, 0.06);
+        transition: box-shadow 220ms ease;
+    }
+}
+
+/* Register page: red/dark glossy theme scoped to its unique wrapper */
+@layer components {
+    .min-h-screen.bg-gray-900.text-white {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        /* prevent decorative layers from showing outside */
+        min-height: 100vh !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin-left: 0 !important;
+        margin-right: 0 !important;
+        background-color: #0b0b0f;
+        /* fallback */
+    }
+
+    .min-h-screen.bg-gray-900.text-white::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background:
+            radial-gradient(1200px 500px at 80% 0%, rgba(239, 68, 68, 0.18), transparent 60%),
+            radial-gradient(1000px 400px at 10% 20%, rgba(190, 18, 60, 0.22), transparent 60%),
+            linear-gradient(135deg, #0a0a0b 0%, #0e0e12 40%, #111015 100%);
+    }
+
+    .min-h-screen.bg-gray-900.text-white::after {
+        content: "";
+        position: absolute;
+        inset: -5%;
+        z-index: 0;
+        pointer-events: none;
+        background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.35) 100%);
+    }
+
+    /* Glassy card */
+    .min-h-screen.bg-gray-900.text-white .bg-gray-800 {
+        position: relative;
+        z-index: 1;
+        overflow: hidden;
+        background: rgba(17, 17, 24, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(14px) saturate(115%);
+        box-shadow:
+            0 10px 30px rgba(239, 68, 68, 0.12),
+            0 2px 8px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .min-h-screen.bg-gray-900.text-white .bg-gray-800::before {
+        content: "";
+        position: absolute;
+        top: -30%;
+        left: -20%;
+        width: 160%;
+        height: 80%;
+        transform: rotate(6deg);
+        background: linear-gradient(to bottom,
+                rgba(255, 255, 255, 0.08),
+                rgba(255, 255, 255, 0.02) 35%,
+                rgba(255, 255, 255, 0) 60%);
+        pointer-events: none;
+    }
+
+    /* Inputs */
+    .min-h-screen.bg-gray-900.text-white input,
+    .min-h-screen.bg-gray-900.text-white select {
+        background: rgba(22, 22, 28, 0.65);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: #f5f5f7;
+        transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+    }
+
+    .min-h-screen.bg-gray-900.text-white input::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+    }
+
+    .min-h-screen.bg-gray-900.text-white input:focus,
+    .min-h-screen.bg-gray-900.text-white select:focus {
+        outline: none;
+        background: rgba(26, 26, 34, 0.75);
+        border-color: rgba(248, 113, 113, 0.55);
+        box-shadow:
+            0 0 0 2px rgba(24, 24, 27, 0.9),
+            0 0 0 4px rgba(248, 113, 113, 0.45),
+            0 8px 24px rgba(220, 38, 38, 0.22);
+    }
+
+    /* Button overrides from cyan to red theme */
+    .min-h-screen.bg-gray-900.text-white .bg-cyan-600 {
+        background-image: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    }
+
+    .min-h-screen.bg-gray-900.text-white .hover\:bg-cyan-700:hover {
+        filter: brightness(1.07);
+    }
+
+    .min-h-screen.bg-gray-900.text-white .focus\:ring-cyan-500:focus {
+        box-shadow:
+            0 0 0 3px rgba(24, 24, 27, 1),
+            0 0 0 6px rgba(248, 113, 113, 0.55) !important;
+    }
+
+    /* Link + heading accents to red */
+    .min-h-screen.bg-gray-900.text-white .text-cyan-400 {
+        color: #f87171;
+    }
+
+    .min-h-screen.bg-gray-900.text-white a.text-cyan-400:hover {
+        color: #fecaca;
+    }
+
+    /* Labels */
+    .min-h-screen.bg-gray-900.text-white .text-gray-400 {
+        color: rgba(209, 213, 219, 0.82);
+    }
+}
+
+/* User Catalog page: themed banner layout and hero, scoped to .user-catalog */
+@layer components {
+    .user-catalog {
+        position: relative;
+        isolation: isolate;
+        overflow: hidden;
+        background-color: #0b0b0f;
+        /* fallback */
+    }
+
+    .user-catalog::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background:
+            radial-gradient(1200px 500px at 85% -10%, rgba(239, 68, 68, 0.18), transparent 60%),
+            radial-gradient(900px 420px at -10% 20%, rgba(190, 18, 60, 0.22), transparent 60%),
+            linear-gradient(135deg, #0a0a0b 0%, #0e0e12 40%, #111015 100%);
+    }
+
+    .user-catalog::after {
+        content: "";
+        position: absolute;
+        inset: -5%;
+        z-index: 0;
+        pointer-events: none;
+        background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.35) 100%);
+    }
+
+    /* Hero */
+    .user-catalog .uc-hero-card {
+        position: relative;
+        overflow: hidden;
+        padding: 2rem;
+        border-radius: 1rem;
+        background: rgba(17, 17, 24, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        backdrop-filter: blur(14px) saturate(115%);
+        box-shadow:
+            0 10px 30px rgba(239, 68, 68, 0.12),
+            0 2px 8px rgba(0, 0, 0, 0.35),
+            inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        animation: uc-fadeUp .7s ease both;
+    }
+
+    .user-catalog .uc-hero-card::before {
+        content: "";
+        position: absolute;
+        top: -30%;
+        left: -20%;
+        width: 160%;
+        height: 80%;
+        transform: rotate(6deg);
+        background: linear-gradient(to bottom, rgba(255, 255, 255, .08), rgba(255, 255, 255, .02) 35%, rgba(255, 255, 255, 0) 60%);
+        pointer-events: none;
+    }
+
+    /* Center hero content and features */
+    .user-catalog .uc-hero-content {
+        max-width: 980px;
+        margin-left: auto;
+        margin-right: auto;
+        text-align: center;
+    }
+
+    .user-catalog .uc-hero-title {
+        color: #fff;
+        font-weight: 800;
+        font-size: clamp(1.5rem, 2.8vw, 2.25rem);
+        letter-spacing: .2px;
+    }
+
+    .user-catalog .uc-hero-sub {
+        color: rgba(209, 213, 219, .9);
+        margin-top: .9rem;
+        max-width: 70ch;
+        margin-left: auto;
+        margin-right: auto;
+    }
+
+    .user-catalog .uc-hero-features {
+        display: flex;
+        flex-wrap: wrap;
+        gap: .5rem;
+        margin-top: 1rem;
+        justify-content: center;
+    }
+
+    .user-catalog .uc-hero-features li {
+        color: #fee2e2;
+        /* red-100 */
+        background: linear-gradient(135deg, rgba(239, 68, 68, .25), rgba(185, 28, 28, .25));
+        border: 1px solid rgba(248, 113, 113, .4);
+        padding: .4rem .7rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        font-size: .85rem;
+        backdrop-filter: blur(6px);
+    }
+
+    .user-catalog .uc-hero-ctas {
+        display: flex;
+        gap: .75rem;
+        margin-top: 1.25rem;
+        flex-wrap: wrap;
+    }
+
+    .user-catalog .uc-cta {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: .7rem 1rem;
+        border-radius: .75rem;
+        font-weight: 700;
+        color: white;
+        text-decoration: none;
+        background-image: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+        box-shadow: 0 10px 20px rgba(239, 68, 68, .18), inset 0 1px 0 rgba(255, 255, 255, .08);
+        transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    }
+
+    .user-catalog .uc-cta:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.05);
+    }
+
+    .user-catalog .uc-cta:active {
+        transform: translateY(0);
+        filter: brightness(.98);
+    }
+
+    .user-catalog .uc-cta.uc-cta--alt {
+        background: rgba(31, 31, 38, .6);
+        border: 1px solid rgba(255, 255, 255, .08);
+        color: #fecaca;
+        box-shadow: inset 0 1px 0 rgba(255, 255, 255, .06);
+    }
+
+    /* Compact tile grid for events (Netflix-like), with a little breathing room */
+    .user-catalog .uc-grid {
+        /* allow Tailwind grid-cols utilities to work; set a sensible default */
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 5rem;
+        max-width: none;
+        margin-inline: 0;
+    }
+
+    /* Ensure card titles under posters are visible and clamped */
+    .user-catalog .uc-card-title {
+        color: #e4fff4dd;
+        font-weight: 700;
+        line-height: 2.25;
+        word-break: break-word;
+        hyphens: auto;
+        min-height: 2.2em;
+    }
+
+    /* When only a single event card exists, make the banner more compact */
+    .user-catalog .uc-grid:has(> .group:only-child) {
+        max-width: 760px;
+    }
+
+    /* Card tile tweaks (lightweight, let Tailwind drive most styles) */
+    .user-catalog .uc-grid .group {
+        display: block;
+        animation: uc-fadeUp .4s ease both;
+    }
+
+    .user-catalog .uc-grid .group img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        display: block;
+        transition: transform .25s ease;
+    }
+
+    /* Button/link accent overrides */
+    .user-catalog .bg-indigo-600 {
+        background-image: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+    }
+
+    .user-catalog .hover\:bg-indigo-700:hover {
+        filter: brightness(1.07);
+    }
+
+    .user-catalog .focus\:ring-indigo-500:focus {
+        box-shadow: 0 0 0 3px rgba(24, 24, 27, 1), 0 0 0 6px rgba(248, 113, 113, .55) !important;
+    }
+
+    /* Filter buttons visibility and affordance (scoped) */
+    .user-catalog .uc-filters .uc-filter-btn {
+        position: relative;
+        background: rgba(31, 31, 38, .72);
+        border: 1px solid rgba(255, 255, 255, .12);
+        color: #f3f4f6 !important;
+        /* ensure readable text */
+        box-shadow: 0 6px 18px rgba(239, 68, 68, .10), inset 0 1px 0 rgba(255, 255, 255, .08);
+        backdrop-filter: blur(6px) saturate(115%);
+        transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease, filter .18s ease;
+    }
+
+    .user-catalog .uc-filters .uc-filter-btn:hover {
+        border-color: rgba(248, 113, 113, .5);
+        transform: translateY(-2px);
+        filter: brightness(1.06);
+    }
+
+    /* Active state uses the existing bg-indigo-600 class; give it the red gradient and stronger border */
+    .user-catalog .uc-filters .uc-filter-btn.bg-indigo-600 {
+        background-image: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+        border-color: rgba(248, 113, 113, .6);
+        color: #fff !important;
+        box-shadow: 0 10px 24px rgba(239, 68, 68, .18), inset 0 1px 0 rgba(255, 255, 255, .12);
+    }
+
+
+    /* Appear animation staggering */
+    .user-catalog .uc-grid>*:nth-child(1) {
+        animation-delay: .05s;
+    }
+
+    .user-catalog .uc-grid>*:nth-child(2) {
+        animation-delay: .1s;
+    }
+
+    .user-catalog .uc-grid>*:nth-child(3) {
+        animation-delay: .15s;
+    }
+
+    .user-catalog .uc-grid>*:nth-child(4) {
+        animation-delay: .2s;
+    }
+
+    .user-catalog .uc-grid>*:nth-child(5) {
+        animation-delay: .25s;
+    }
+
+}
+
+@keyframes uc-fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(12px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}

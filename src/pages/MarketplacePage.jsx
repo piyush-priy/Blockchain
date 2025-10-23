@@ -7,7 +7,7 @@ import TicketNFT from '../../artifacts/contracts/TicketNFT.sol/TicketNFT.json';
 import { MARKETPLACE_ADDRESS } from '../config';
 
 const MarketplacePage = () => {
-    const { provider, showMessage, currentUser:user } = useContext(AppContext);
+    const { provider, showMessage, currentUser: user } = useContext(AppContext);
     const [listedTickets, setListedTickets] = useState([]);
     const [loading, setLoading] = useState(true);
 
@@ -17,7 +17,7 @@ const MarketplacePage = () => {
             setLoading(true);
             try {
                 const marketplaceContract = new ethers.Contract(MARKETPLACE_ADDRESS, Marketplace.abi, provider);
-                
+
                 // Fetch all past "TicketListed" events
                 const listedFilter = marketplaceContract.filters.TicketListed();
                 const listedEvents = await marketplaceContract.queryFilter(listedFilter);
@@ -27,7 +27,7 @@ const MarketplacePage = () => {
                 const soldEvents = await marketplaceContract.queryFilter(soldFilter);
                 const unlistedFilter = marketplaceContract.filters.TicketUnlisted();
                 const unlistedEvents = await marketplaceContract.queryFilter(unlistedFilter);
-                
+
                 // Create a set of unique identifiers for tickets that are no longer active
                 // const soldOrUnlisted = new Set([
                 //     ...soldEvents.map(e => `${e.args.nftContract}-${e.args.tokenId}`),
@@ -49,11 +49,11 @@ const MarketplacePage = () => {
                         const { listingId, nftContract, tokenId, seller, price } = e.args;
                         const ticketContract = new ethers.Contract(nftContract, TicketNFT.abi, provider);
                         const tokenUri = await ticketContract.tokenURI(tokenId);
-                        
+
                         // Assuming the token URI is a link to a backend metadata endpoint
                         const metadataResponse = await fetch(tokenUri);
                         const metadata = await metadataResponse.json();
-                        
+
                         return {
                             listingId,
                             nftContract,
@@ -64,7 +64,7 @@ const MarketplacePage = () => {
                         };
                     })
                 );
-                
+
                 setListedTickets(ticketsWithMetadata);
 
             } catch (error) {
@@ -78,14 +78,14 @@ const MarketplacePage = () => {
         fetchListedTickets();
     }, [provider, showMessage]);
 
-    
+
     const handleBuyTicket = async (ticket) => {
         if (!provider || !user || !user.wallet) {
             showMessage("Please connect your wallet.", "error");
             return;
         }
         const toastId = showMessage("Processing purchase...", "loading");
-        
+
         try {
             const signer = await provider.getSigner();
             const marketplaceContract = new ethers.Contract(MARKETPLACE_ADDRESS, Marketplace.abi, signer);
@@ -113,7 +113,7 @@ const MarketplacePage = () => {
             });
 
             if (!updateResponse.ok) {
-                 // Log error but don't fail the entire process
+                // Log error but don't fail the entire process
                 console.error("Failed to update owner in backend:", await updateResponse.text());
                 showMessage("Purchase complete, but backend update failed.", { id: toastId, type: 'error' });
             } else {
@@ -136,7 +136,7 @@ const MarketplacePage = () => {
         <div className="container mx-auto px-4 py-8">
             <PageTitle title="Secondary Marketplace" subtitle="Buy and sell tickets from other users" />
             {listedTickets.length === 0 ? (
-                 <div className="text-center bg-gray-800 p-8 rounded-lg">
+                <div className="text-center bg-gray-800 p-8 rounded-lg">
                     <h3 className="text-xl text-white">No tickets are currently for sale.</h3>
                     <p className="text-gray-400 mt-2">Check back later or list one of your own from your profile!</p>
                 </div>
@@ -150,19 +150,19 @@ const MarketplacePage = () => {
                         };
                         const eventDate = findAttr('Date');
                         const eventVenue = findAttr('Venue');
-                        
+
                         // Format the date for display
-                        const formattedDate = eventDate !== 'N/A' 
-                            ? new Date(eventDate).toLocaleDateString() 
+                        const formattedDate = eventDate !== 'N/A'
+                            ? new Date(eventDate).toLocaleDateString()
                             : 'N/A';
 
                         return (
                             <div key={ticket.listingId.toString()} className="bg-gray-800 rounded-lg shadow-lg p-4 flex flex-col justify-between transform hover:-translate-y-1 transition-transform">
-                                <img src={ticket.image} alt={ticket.name} className="rounded-md mb-4 aspect-[2/3] object-cover"/>
+                                <img src={ticket.image} alt={ticket.name} className="rounded-md mb-4 aspect-[2/3] object-cover" />
                                 <div>
                                     <h3 className="text-xl font-bold text-white truncate">{ticket.name}</h3>
                                     <p className="text-gray-400 text-sm truncate">Seller: {ticket.seller}</p>
-                                    
+
                                     {/* --- ADDED DATE AND VENUE --- */}
                                     <p className="text-gray-400 text-sm truncate">Venue: {eventVenue}</p>
                                     <p className="text-gray-400 text-sm">Date: {formattedDate}</p>
