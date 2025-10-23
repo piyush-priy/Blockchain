@@ -1,0 +1,299 @@
+/* Seat Selection Page - Aesthetic, professional styling
+	 Scoping approach: target the specific layout structure of the SeatSelectionPage
+	 using :has() on the top container that includes the distinctive SCREEN bar inside
+	 the first .bg-gray-800 card. This avoids changing JS and minimizes impact on other pages.
+*/
+
+/* Root scope selector: container having the seat map card with the SCREEN bar */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) {
+    position: relative;
+    isolation: isolate;
+}
+
+/* Subtle themed background accents behind content */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500)::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    pointer-events: none;
+    background:
+        radial-gradient(900px 380px at 95% -10%, rgba(239, 68, 68, 0.18), transparent 60%),
+        radial-gradient(800px 360px at 0% 20%, rgba(190, 18, 60, 0.2), transparent 60%);
+}
+
+/* Elevate the two main cards with glass-like style within this scope */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .bg-gray-800 {
+    position: relative;
+    z-index: 1;
+    background: rgba(17, 17, 24, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px) saturate(115%);
+    box-shadow:
+        0 10px 30px rgba(239, 68, 68, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* SCREEN bar makeover */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .w-full.h-4.bg-gray-500 {
+    position: relative;
+    height: 18px !important;
+    border-radius: .5rem .5rem 0 0 !important;
+    background: transparent !important;
+    /* let the curved pseudo element be visible */
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+    letter-spacing: 1px;
+    overflow: visible;
+}
+
+/* Curved screen shape (concave toward audience) */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .w-full.h-4.bg-gray-500::before {
+    content: '';
+    position: absolute;
+    left: -7%;
+    width: 114%;
+    top: -120px;
+    /* raise above the bar */
+    height: 140px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .25));
+    border-bottom-left-radius: 160px;
+    border-bottom-right-radius: 160px;
+    box-shadow:
+        0 12px 28px rgba(239, 68, 68, .18),
+        0 2px 8px rgba(0, 0, 0, .35),
+        inset 0 -1px 0 rgba(255, 255, 255, .2);
+    pointer-events: none;
+}
+
+/* Thin highlight edge to emphasize the curve */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .w-full.h-4.bg-gray-500::after {
+    content: '';
+    position: absolute;
+    left: -7%;
+    width: 114%;
+    top: -3px;
+    height: 6px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, .0), rgba(255, 255, 255, .65), rgba(255, 255, 255, .0));
+    border-radius: 9999px;
+    filter: blur(.5px);
+    pointer-events: none;
+}
+
+/* Seat rows area spacing */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .space-y-3 {
+    row-gap: .5rem !important;
+}
+
+/* Row label (A, B, C...) */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .text-gray-400.font-bold.w-8 {
+    color: #fee2e2 !important;
+    /* red-100 */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .6);
+}
+
+/* Seat buttons base styles within the map card */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) button.w-10.h-10.rounded-md {
+    border: 1px solid rgba(255, 255, 255, .12);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+/* Available seat */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) button.w-10.h-10.rounded-md.bg-gray-300 {
+    background: linear-gradient(180deg, #e5e7eb, #d1d5db) !important;
+    /* gray-200 -> gray-300 */
+}
+
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) button.w-10.h-10.rounded-md.bg-gray-300:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .28);
+}
+
+/* Selected seat */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) button.w-10.h-10.rounded-md.bg-indigo-500 {
+    background-image: linear-gradient(135deg, #11f730 0%, #04d920 100%) !important;
+    border-color: rgba(248, 113, 113, .65) !important;
+    box-shadow: 0 6px 18px rgba(239, 68, 68, .3), inset 0 1px 0 rgba(255, 255, 255, .12);
+}
+
+/* Unavailable seat */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) button.w-10.h-10.rounded-md.bg-red-400 {
+    background: linear-gradient(180deg, #f87171, #ef4444) !important;
+    cursor: not-allowed !important;
+    filter: grayscale(.2) contrast(.95);
+}
+
+/* Empty seat (no type) */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) button.w-10.h-10.rounded-md.bg-gray-900 {
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, .08);
+}
+
+/* Selection summary card tweaks */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .mt-8.bg-gray-800.p-6.rounded-lg {
+    border: 1px solid rgba(255, 255, 255, .1);
+}
+
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .mt-8.bg-gray-800.p-6.rounded-lg h3 {
+    letter-spacing: .2px;
+}
+
+/* Proceed button: align to theme */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .bg-green-600 {
+    background-image: linear-gradient(135deg, #bc1b1b 0%, #ef0000 100%) !important;
+    border: 1px solid rgba(248, 113, 113, .55);
+    box-shadow: 0 12px 28px rgba(239, 68, 68, .22), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .hover\:bg-green-700:hover {
+    filter: brightness(1.06);
+}
+
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .disabled\:bg-gray-500:disabled {
+    opacity: .85;
+}
+
+/* Subtle fade-up for rows */
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .space-y-3>div {
+    animation: ss-fadeUp .4s ease both;
+}
+
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .space-y-3>div:nth-child(1) {
+    animation-delay: .03s;
+}
+
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .space-y-3>div:nth-child(2) {
+    animation-delay: .06s;
+}
+
+.container.mx-auto.px-4.py-8:has(> .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500) .space-y-3>div:nth-child(3) {
+    animation-delay: .09s;
+}
+
+@keyframes ss-fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(6px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ===== Fallback (no :has()) — apply same styling via specific structure selectors ===== */
+/* Elevate the main seat map card */
+.container.mx-auto.px-4.py-8 .bg-gray-800.p-8.rounded-lg {
+    position: relative;
+    z-index: 1;
+    background: rgba(17, 17, 24, 0.55) !important;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(12px) saturate(115%);
+    box-shadow:
+        0 10px 30px rgba(239, 68, 68, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+}
+
+/* Curved SCREEN bar */
+.container.mx-auto.px-4.py-8 .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500 {
+    position: relative;
+    height: 18px !important;
+    border-radius: .5rem .5rem 0 0 !important;
+    background: transparent !important;
+    color: #fff;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+    letter-spacing: 1px;
+    overflow: visible;
+}
+
+.container.mx-auto.px-4.py-8 .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500::before {
+    content: '';
+    position: absolute;
+    left: -7%;
+    width: 114%;
+    top: -120px;
+    height: 140px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, .9), rgba(255, 255, 255, .25));
+    border-bottom-left-radius: 160px;
+    border-bottom-right-radius: 160px;
+    box-shadow:
+        0 12px 28px rgba(239, 68, 68, .18),
+        0 2px 8px rgba(0, 0, 0, .35),
+        inset 0 -1px 0 rgba(255, 255, 255, .2);
+    pointer-events: none;
+}
+
+.container.mx-auto.px-4.py-8 .bg-gray-800.p-8.rounded-lg .w-full.h-4.bg-gray-500::after {
+    content: '';
+    position: absolute;
+    left: -7%;
+    width: 114%;
+    top: -3px;
+    height: 6px;
+    background: linear-gradient(90deg, rgba(255, 255, 255, .0), rgba(255, 255, 255, .65), rgba(255, 255, 255, .0));
+    border-radius: 9999px;
+    filter: blur(.5px);
+    pointer-events: none;
+}
+
+/* Seat buttons base + variants */
+.container.mx-auto.px-4.py-8 .bg-gray-800.p-8.rounded-lg button.w-10.h-10.rounded-md {
+    border: 1px solid rgba(255, 255, 255, .12);
+    box-shadow: 0 2px 6px rgba(0, 0, 0, .25);
+    transition: transform .15s ease, box-shadow .15s ease, filter .15s ease;
+}
+
+.container.mx-auto.px-4.py-8 .bg-gray-800.p-8.rounded-lg button.w-10.h-10.rounded-md.bg-gray-300 {
+    background: linear-gradient(180deg, #e5e7eb, #d1d5db) !important;
+}
+
+.container.mx-auto.px-4.py-8 .bg-gray-800.p-8.rounded-lg button.w-10.h-10.rounded-md.bg-gray-300:hover {
+    filter: brightness(1.05);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .28);
+}
+
+.container.mx-auto.px-4.py-8 .bg-gray-800.p-8.rounded-lg button.w-10.h-10.rounded-md.bg-indigo-500 {
+    background-image: linear-gradient(135deg, #11f730 0%, #04d920 100%) !important;
+    border-color: rgba(248, 113, 113, .65) !important;
+    box-shadow: 0 6px 18px rgba(239, 68, 68, .3), inset 0 1px 0 rgba(255, 255, 255, .12);
+}
+
+.container.mx-auto.px-4.py-8 .bg-gray-800.p-8.rounded-lg button.w-10.h-10.rounded-md.bg-red-400 {
+    background: linear-gradient(180deg, #f87171, #ef4444) !important;
+    cursor: not-allowed !important;
+    filter: grayscale(.2) contrast(.95);
+}
+
+.container.mx-auto.px-4.py-8 .bg-gray-800.p-8.rounded-lg button.w-10.h-10.rounded-md.bg-gray-900 {
+    border-style: dashed;
+    border-color: rgba(255, 255, 255, .08);
+}
+
+/* Selection summary card and proceed button */
+.container.mx-auto.px-4.py-8 .mt-8.bg-gray-800.p-6.rounded-lg {
+    border: 1px solid rgba(255, 255, 255, .1);
+}
+
+.container.mx-auto.px-4.py-8 .mt-8.bg-gray-800.p-6.rounded-lg h3 {
+    letter-spacing: .2px;
+}
+
+.container.mx-auto.px-4.py-8 .mt-8.bg-gray-800.p-6.rounded-lg .bg-green-600 {
+    background-image: linear-gradient(135deg, #bc1b1b 0%, #ef0000 100%) !important;
+    border: 1px solid rgba(248, 113, 113, .55);
+    box-shadow: 0 12px 28px rgba(239, 68, 68, .22), inset 0 1px 0 rgba(255, 255, 255, .08);
+}
+
+.container.mx-auto.px-4.py-8 .mt-8.bg-gray-800.p-6.rounded-lg .hover\:bg-green-700:hover {
+    filter: brightness(1.06);
+}
+
+.container.mx-auto.px-4.py-8 .mt-8.bg-gray-800.p-6.rounded-lg .disabled\:bg-gray-500:disabled {
+    opacity: .85;
+}

@@ -1,0 +1,5 @@
+ Fix datetime type in prisma schema events table
+ Backend console.log messages
+ Descriptive messages for ADMIN
+ "contractAddress" in events table ??
+ Case sensitivity for 'roles' attribute
