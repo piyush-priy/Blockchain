@@ -63,22 +63,23 @@ let EventsService = (() => {
                     : dto.seatLayout;
                 return await this.prisma.events.create({
                     data: {
-                        organizerId: organizerId,
+                        organizerId, // matches Prisma schema
                         name: dto.name.trim(),
-                        date: dto.date,
+                        date: new Date(dto.date), // DateTime type in schema
                         venue: dto.venue.trim(),
+                        status: dto.status ?? 'Pending', // optional field with default in DB
                         maxResaleCount: dto.maxResaleCount ?? 3,
                         priceCap: dto.priceCap ?? 120,
-                        description: dto.description,
-                        posterUrl: dto.posterUrl,
+                        description: dto.description?.trim(),
+                        posterUrl: dto.posterUrl?.trim(),
                         seatLayout: seatLayoutJSON,
-                        type: dto.type,
+                        type: dto.type?.trim(),
+                        contractAddress: dto.contractAddress?.trim() || null,
                     },
                 });
             }
             catch (err) {
                 if (err instanceof library_1.PrismaClientKnownRequestError) {
-                    // Handle known Prisma constraint errors
                     if (err.code === 'P2002') {
                         throw new common_1.ConflictException('An event with this name or ID already exists.');
                     }
@@ -163,6 +164,29 @@ let EventsService = (() => {
                 if (err instanceof common_1.NotFoundException)
                     throw err;
                 throw new common_1.InternalServerErrorException('Failed to update event: ' + err.message);
+            }
+        }
+        //Get unavailable seats for an event
+        async getUnavailableSeats(eventId) {
+            try {
+                const tickets = await this.prisma.tickets.findMany({
+                    where: {
+                        eventId: eventId,
+                    },
+                    select: {
+                        seatIdentifier: true,
+                    },
+                });
+                // Extract the seat identifiers into a simple array of strings
+                // Filter out any potential null/empty values just in case
+                const unavailableSeats = tickets
+                    .map(ticket => ticket.seatIdentifier)
+                    .filter((seatId) => !!seatId);
+                return { unavailableSeats };
+            }
+            catch (err) {
+                console.error(`Failed to fetch unavailable seats for event ${eventId}:`, err);
+                return [];
             }
         }
         //Delete Event

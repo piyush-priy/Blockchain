@@ -11,6 +11,7 @@ async function bootstrap() {
     });
     app.useGlobalPipes(new common_1.ValidationPipe({
         whitelist: true,
+        transform: true
     }));
     await app.listen(process.env.PORT ?? 3001);
     console.log('Server is running on port ' + (process.env.PORT ?? 3001));

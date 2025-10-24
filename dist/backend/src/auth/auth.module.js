@@ -43,16 +43,18 @@ const jwt_1 = require("@nestjs/jwt");
 const config_1 = require("@nestjs/config");
 const jwt_strategy_1 = require("./jwt.strategy");
 const jwt_auth_guard_1 = require("./jwt-auth.guard");
+const passport_1 = require("@nestjs/passport");
 let AuthModule = (() => {
     let _classDecorators = [(0, common_1.Module)({
             imports: [
                 prisma_module_1.PrismaModule,
                 config_1.ConfigModule.forRoot({ isGlobal: true }),
+                passport_1.PassportModule.register({ defaultStrategy: 'jwt' }),
                 jwt_1.JwtModule.registerAsync({
                     global: true,
                     imports: [config_1.ConfigModule],
                     useFactory: (configService) => ({
-                        secret: configService.get('JWT_SECRET'),
+                        secret: configService.getOrThrow('JWT_SECRET'),
                         signOptions: { expiresIn: '30m' },
                     }),
                     inject: [config_1.ConfigService],
@@ -60,7 +62,7 @@ let AuthModule = (() => {
             ],
             controllers: [auth_controller_1.AuthController],
             providers: [auth_service_1.AuthService, jwt_strategy_1.JwtStrategy, jwt_auth_guard_1.JwtAuthGuard],
-            exports: [jwt_auth_guard_1.JwtAuthGuard], // <-- allows other modules (like events) to use it
+            exports: [jwt_auth_guard_1.JwtAuthGuard],
         })];
     let _classDescriptor;
     let _classExtraInitializers = [];

@@ -1,0 +1,235 @@
+/* src/pages/RegisterPage.css */
+
+/* Split layout container */
+.register-split-container {
+    position: relative;
+    isolation: isolate;
+    overflow: hidden;
+    min-height: 100vh !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding: 0 !important;
+    background-color: #0b0b0f;
+    display: flex;
+    align-items: stretch;
+}
+
+/* Background gradients */
+.register-split-container::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+    background:
+        radial-gradient(1200px 500px at 80% 0%, rgba(239, 68, 68, 0.18), transparent 60%),
+        radial-gradient(1000px 400px at 10% 20%, rgba(190, 18, 60, 0.22), transparent 60%),
+        linear-gradient(135deg, #0a0a0b 0%, #0e0e12 40%, #111015 100%);
+}
+
+/* Soft vignette */
+.register-split-container::after {
+    content: "";
+    position: absolute;
+    inset: -5%;
+    z-index: 0;
+    pointer-events: none;
+    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, 0.35) 100%);
+}
+
+/* Left side - Welcome section */
+.register-welcome-section {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+}
+
+.register-welcome-content {
+    max-width: 500px;
+}
+
+.register-welcome-title {
+    font-size: clamp(2rem, 4vw, 3.5rem);
+    font-weight: 800;
+    line-height: 1.1;
+    color: #ffffff;
+    margin-bottom: 1.5rem;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, #ffffff 0%, #f87171 50%, #ef4444 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.register-welcome-subtitle {
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+    line-height: 1.6;
+    color: rgba(209, 213, 219, 0.9);
+    font-weight: 400;
+}
+
+/* Right side - Form section */
+.register-form-section {
+    position: relative;
+    z-index: 1;
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 3rem;
+    overflow-y: auto;
+}
+
+/* Glassy register card */
+.register-card {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 480px;
+    padding: 2.5rem;
+    overflow: visible;
+    background: rgba(17, 17, 24, 0.55);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px) saturate(115%);
+    border-radius: 1rem;
+    box-shadow:
+        0 10px 30px rgba(239, 68, 68, 0.12),
+        0 2px 8px rgba(0, 0, 0, 0.35),
+        inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    transition: border-color 0.5s ease;
+}
+
+/* Glow effect using pseudo-element for smooth fade-in */
+.register-card::after {
+    content: "";
+    position: absolute;
+    inset: -20px;
+    border-radius: 1rem;
+    background: radial-gradient(circle at center, rgba(239, 68, 68, 0.4) 0%, rgba(239, 68, 68, 0.2) 40%, transparent 70%);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.6s ease;
+    pointer-events: none;
+}
+
+/* Hover glow effect with accent color - fade in transition */
+.register-card:hover {
+    border-color: rgba(248, 113, 113, 0.3);
+    box-shadow:
+        0 16px 44px rgba(239, 68, 68, 0.16),
+        0 4px 12px rgba(0, 0, 0, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.register-card:hover::after {
+    opacity: 1;
+}
+
+/* Subtle glossy sheen overlay */
+.register-card::before {
+    content: "";
+    position: absolute;
+    top: -30%;
+    left: -20%;
+    width: 160%;
+    height: 80%;
+    transform: rotate(6deg);
+    background: linear-gradient(to bottom,
+            rgba(255, 255, 255, 0.08),
+            rgba(255, 255, 255, 0.02) 35%,
+            rgba(255, 255, 255, 0) 60%);
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* Input fields and selects */
+.register-card input,
+.register-card select {
+    background: rgba(22, 22, 28, 0.65);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #f5f5f7;
+    transition: border-color 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.register-card input::placeholder {
+    color: rgba(255, 255, 255, 0.45);
+}
+
+.register-card input:focus,
+.register-card select:focus {
+    outline: none;
+    background: rgba(26, 26, 34, 0.75);
+    border-color: rgba(248, 113, 113, 0.55);
+    box-shadow:
+        0 0 0 2px rgba(24, 24, 27, 0.9),
+        0 0 0 4px rgba(248, 113, 113, 0.45),
+        0 8px 24px rgba(220, 38, 38, 0.22);
+}
+
+/* Button styling - override cyan to red */
+.register-card .bg-cyan-600 {
+    background-image: linear-gradient(135deg, #ef4444 0%, #b91c1c 100%);
+}
+
+.register-card .hover\:bg-cyan-700:hover {
+    filter: brightness(1.07);
+}
+
+.register-card .focus\:ring-cyan-500:focus {
+    box-shadow:
+        0 0 0 3px rgba(24, 24, 27, 1),
+        0 0 0 6px rgba(248, 113, 113, 0.55) !important;
+}
+
+.register-card .disabled\:bg-gray-500:disabled {
+    background-image: linear-gradient(135deg, #fca5a5 0%, #ef4444 100%);
+    opacity: 0.85;
+}
+
+/* Links and headings */
+.register-card .text-cyan-400 {
+    color: #f87171;
+}
+
+.register-card .text-cyan-400:hover {
+    color: #fecaca;
+}
+
+/* Text colors */
+.register-card .text-gray-300 {
+    color: rgba(243, 244, 246, 0.92);
+}
+
+.register-card .text-gray-400 {
+    color: rgba(209, 213, 219, 0.8);
+}
+
+/* Responsive design */
+@media (max-width: 1024px) {
+    .register-split-container {
+        flex-direction: column;
+    }
+
+    .register-welcome-section {
+        padding: 2rem;
+        min-height: 25vh;
+    }
+
+    .register-welcome-title {
+        font-size: clamp(1.75rem, 5vw, 2.5rem);
+        text-align: center;
+    }
+
+    .register-welcome-subtitle {
+        text-align: center;
+    }
+
+    .register-form-section {
+        padding: 2rem;
+    }
+}

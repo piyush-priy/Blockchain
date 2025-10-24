@@ -58,7 +58,7 @@ let JwtStrategy = (() => {
             super({
                 jwtFromRequest: passport_jwt_1.ExtractJwt.fromAuthHeaderAsBearerToken(),
                 ignoreExpiration: false,
-                secretOrKey: configService.get('JWT_SECRET', 'super_long_and_super_strong_jwt_secret_key'),
+                secretOrKey: configService.getOrThrow('JWT_SECRET'),
             });
             this.configService = configService;
         }
@@ -67,6 +67,8 @@ let JwtStrategy = (() => {
             if (!payload || !payload.id || !payload.email || !payload.role) {
                 throw new common_1.UnauthorizedException('Invalid JWT token payload.');
             }
+            // console.log('JWT Payload:', payload);
+            //
             // Return the user info that will be attached to req.user
             return {
                 id: payload.id,

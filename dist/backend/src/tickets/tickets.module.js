@@ -39,8 +39,10 @@ const common_1 = require("@nestjs/common");
 const tickets_controller_1 = require("./tickets.controller");
 const tickets_service_1 = require("./tickets.service");
 const prisma_service_1 = require("src/prisma/prisma.service");
+const auth_module_1 = require("../auth/auth.module");
 let TicketsModule = (() => {
     let _classDecorators = [(0, common_1.Module)({
+            imports: [auth_module_1.AuthModule],
             controllers: [tickets_controller_1.TicketsController],
             providers: [tickets_service_1.TicketsService, prisma_service_1.PrismaService]
         })];
