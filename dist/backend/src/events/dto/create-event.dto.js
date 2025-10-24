@@ -36,6 +36,7 @@ var __runInitializers = (this && this.__runInitializers) || function (thisArg, i
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.CreateEventDto = void 0;
 const class_validator_1 = require("class-validator");
+const class_transformer_1 = require("class-transformer");
 let CreateEventDto = (() => {
     let _name_decorators;
     let _name_initializers = [];
@@ -46,58 +47,76 @@ let CreateEventDto = (() => {
     let _venue_decorators;
     let _venue_initializers = [];
     let _venue_extraInitializers = [];
-    let _description_decorators;
-    let _description_initializers = [];
-    let _description_extraInitializers = [];
-    let _posterUrl_decorators;
-    let _posterUrl_initializers = [];
-    let _posterUrl_extraInitializers = [];
-    let _type_decorators;
-    let _type_initializers = [];
-    let _type_extraInitializers = [];
-    let _seatLayout_decorators;
-    let _seatLayout_initializers = [];
-    let _seatLayout_extraInitializers = [];
+    let _status_decorators;
+    let _status_initializers = [];
+    let _status_extraInitializers = [];
     let _maxResaleCount_decorators;
     let _maxResaleCount_initializers = [];
     let _maxResaleCount_extraInitializers = [];
     let _priceCap_decorators;
     let _priceCap_initializers = [];
     let _priceCap_extraInitializers = [];
+    let _description_decorators;
+    let _description_initializers = [];
+    let _description_extraInitializers = [];
+    let _posterUrl_decorators;
+    let _posterUrl_initializers = [];
+    let _posterUrl_extraInitializers = [];
+    let _seatLayout_decorators;
+    let _seatLayout_initializers = [];
+    let _seatLayout_extraInitializers = [];
+    let _type_decorators;
+    let _type_initializers = [];
+    let _type_extraInitializers = [];
+    let _contractAddress_decorators;
+    let _contractAddress_initializers = [];
+    let _contractAddress_extraInitializers = [];
+    let _organizerId_decorators;
+    let _organizerId_initializers = [];
+    let _organizerId_extraInitializers = [];
     return class CreateEventDto {
         static {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
             _name_decorators = [(0, class_validator_1.IsString)(), (0, class_validator_1.IsNotEmpty)()];
-            _date_decorators = [(0, class_validator_1.IsString)(), (0, class_validator_1.IsNotEmpty)()];
+            _date_decorators = [(0, class_validator_1.IsDateString)(), (0, class_validator_1.IsNotEmpty)()];
             _venue_decorators = [(0, class_validator_1.IsString)(), (0, class_validator_1.IsNotEmpty)()];
-            _description_decorators = [(0, class_validator_1.IsString)(), (0, class_validator_1.IsNotEmpty)()];
-            _posterUrl_decorators = [(0, class_validator_1.IsString)(), (0, class_validator_1.IsNotEmpty)()];
-            _type_decorators = [(0, class_validator_1.IsString)(), (0, class_validator_1.IsNotEmpty)()];
-            _seatLayout_decorators = [(0, class_validator_1.IsOptional)()];
-            _maxResaleCount_decorators = [(0, class_validator_1.IsOptional)(), (0, class_validator_1.IsInt)()];
-            _priceCap_decorators = [(0, class_validator_1.IsOptional)(), (0, class_validator_1.IsInt)()];
+            _status_decorators = [(0, class_validator_1.IsOptional)(), (0, class_validator_1.IsString)()];
+            _maxResaleCount_decorators = [(0, class_validator_1.IsOptional)(), (0, class_transformer_1.Type)(() => Number), (0, class_validator_1.IsInt)()];
+            _priceCap_decorators = [(0, class_validator_1.IsOptional)(), (0, class_transformer_1.Type)(() => Number), (0, class_validator_1.IsInt)()];
+            _description_decorators = [(0, class_validator_1.IsOptional)(), (0, class_validator_1.IsString)()];
+            _posterUrl_decorators = [(0, class_validator_1.IsOptional)(), (0, class_validator_1.IsString)()];
+            _seatLayout_decorators = [(0, class_validator_1.IsOptional)(), (0, class_validator_1.IsObject)()];
+            _type_decorators = [(0, class_validator_1.IsOptional)(), (0, class_validator_1.IsString)()];
+            _contractAddress_decorators = [(0, class_validator_1.IsOptional)(), (0, class_validator_1.IsString)()];
+            _organizerId_decorators = [(0, class_validator_1.IsOptional)(), (0, class_transformer_1.Type)(() => Number), (0, class_validator_1.IsInt)()];
             __esDecorate(null, null, _name_decorators, { kind: "field", name: "name", static: false, private: false, access: { has: obj => "name" in obj, get: obj => obj.name, set: (obj, value) => { obj.name = value; } }, metadata: _metadata }, _name_initializers, _name_extraInitializers);
             __esDecorate(null, null, _date_decorators, { kind: "field", name: "date", static: false, private: false, access: { has: obj => "date" in obj, get: obj => obj.date, set: (obj, value) => { obj.date = value; } }, metadata: _metadata }, _date_initializers, _date_extraInitializers);
             __esDecorate(null, null, _venue_decorators, { kind: "field", name: "venue", static: false, private: false, access: { has: obj => "venue" in obj, get: obj => obj.venue, set: (obj, value) => { obj.venue = value; } }, metadata: _metadata }, _venue_initializers, _venue_extraInitializers);
-            __esDecorate(null, null, _description_decorators, { kind: "field", name: "description", static: false, private: false, access: { has: obj => "description" in obj, get: obj => obj.description, set: (obj, value) => { obj.description = value; } }, metadata: _metadata }, _description_initializers, _description_extraInitializers);
-            __esDecorate(null, null, _posterUrl_decorators, { kind: "field", name: "posterUrl", static: false, private: false, access: { has: obj => "posterUrl" in obj, get: obj => obj.posterUrl, set: (obj, value) => { obj.posterUrl = value; } }, metadata: _metadata }, _posterUrl_initializers, _posterUrl_extraInitializers);
-            __esDecorate(null, null, _type_decorators, { kind: "field", name: "type", static: false, private: false, access: { has: obj => "type" in obj, get: obj => obj.type, set: (obj, value) => { obj.type = value; } }, metadata: _metadata }, _type_initializers, _type_extraInitializers);
-            __esDecorate(null, null, _seatLayout_decorators, { kind: "field", name: "seatLayout", static: false, private: false, access: { has: obj => "seatLayout" in obj, get: obj => obj.seatLayout, set: (obj, value) => { obj.seatLayout = value; } }, metadata: _metadata }, _seatLayout_initializers, _seatLayout_extraInitializers);
+            __esDecorate(null, null, _status_decorators, { kind: "field", name: "status", static: false, private: false, access: { has: obj => "status" in obj, get: obj => obj.status, set: (obj, value) => { obj.status = value; } }, metadata: _metadata }, _status_initializers, _status_extraInitializers);
             __esDecorate(null, null, _maxResaleCount_decorators, { kind: "field", name: "maxResaleCount", static: false, private: false, access: { has: obj => "maxResaleCount" in obj, get: obj => obj.maxResaleCount, set: (obj, value) => { obj.maxResaleCount = value; } }, metadata: _metadata }, _maxResaleCount_initializers, _maxResaleCount_extraInitializers);
             __esDecorate(null, null, _priceCap_decorators, { kind: "field", name: "priceCap", static: false, private: false, access: { has: obj => "priceCap" in obj, get: obj => obj.priceCap, set: (obj, value) => { obj.priceCap = value; } }, metadata: _metadata }, _priceCap_initializers, _priceCap_extraInitializers);
+            __esDecorate(null, null, _description_decorators, { kind: "field", name: "description", static: false, private: false, access: { has: obj => "description" in obj, get: obj => obj.description, set: (obj, value) => { obj.description = value; } }, metadata: _metadata }, _description_initializers, _description_extraInitializers);
+            __esDecorate(null, null, _posterUrl_decorators, { kind: "field", name: "posterUrl", static: false, private: false, access: { has: obj => "posterUrl" in obj, get: obj => obj.posterUrl, set: (obj, value) => { obj.posterUrl = value; } }, metadata: _metadata }, _posterUrl_initializers, _posterUrl_extraInitializers);
+            __esDecorate(null, null, _seatLayout_decorators, { kind: "field", name: "seatLayout", static: false, private: false, access: { has: obj => "seatLayout" in obj, get: obj => obj.seatLayout, set: (obj, value) => { obj.seatLayout = value; } }, metadata: _metadata }, _seatLayout_initializers, _seatLayout_extraInitializers);
+            __esDecorate(null, null, _type_decorators, { kind: "field", name: "type", static: false, private: false, access: { has: obj => "type" in obj, get: obj => obj.type, set: (obj, value) => { obj.type = value; } }, metadata: _metadata }, _type_initializers, _type_extraInitializers);
+            __esDecorate(null, null, _contractAddress_decorators, { kind: "field", name: "contractAddress", static: false, private: false, access: { has: obj => "contractAddress" in obj, get: obj => obj.contractAddress, set: (obj, value) => { obj.contractAddress = value; } }, metadata: _metadata }, _contractAddress_initializers, _contractAddress_extraInitializers);
+            __esDecorate(null, null, _organizerId_decorators, { kind: "field", name: "organizerId", static: false, private: false, access: { has: obj => "organizerId" in obj, get: obj => obj.organizerId, set: (obj, value) => { obj.organizerId = value; } }, metadata: _metadata }, _organizerId_initializers, _organizerId_extraInitializers);
             if (_metadata) Object.defineProperty(this, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
         }
         name = __runInitializers(this, _name_initializers, void 0);
         date = (__runInitializers(this, _name_extraInitializers), __runInitializers(this, _date_initializers, void 0));
         venue = (__runInitializers(this, _date_extraInitializers), __runInitializers(this, _venue_initializers, void 0));
-        description = (__runInitializers(this, _venue_extraInitializers), __runInitializers(this, _description_initializers, void 0));
+        status = (__runInitializers(this, _venue_extraInitializers), __runInitializers(this, _status_initializers, void 0)); // defaults to "Pending" in DB
+        maxResaleCount = (__runInitializers(this, _status_extraInitializers), __runInitializers(this, _maxResaleCount_initializers, void 0)); // defaults to 3
+        priceCap = (__runInitializers(this, _maxResaleCount_extraInitializers), __runInitializers(this, _priceCap_initializers, void 0)); // defaults to 120
+        description = (__runInitializers(this, _priceCap_extraInitializers), __runInitializers(this, _description_initializers, void 0));
         posterUrl = (__runInitializers(this, _description_extraInitializers), __runInitializers(this, _posterUrl_initializers, void 0));
-        type = (__runInitializers(this, _posterUrl_extraInitializers), __runInitializers(this, _type_initializers, void 0));
-        seatLayout = (__runInitializers(this, _type_extraInitializers), __runInitializers(this, _seatLayout_initializers, void 0));
-        maxResaleCount = (__runInitializers(this, _seatLayout_extraInitializers), __runInitializers(this, _maxResaleCount_initializers, void 0));
-        priceCap = (__runInitializers(this, _maxResaleCount_extraInitializers), __runInitializers(this, _priceCap_initializers, void 0));
+        seatLayout = (__runInitializers(this, _posterUrl_extraInitializers), __runInitializers(this, _seatLayout_initializers, void 0));
+        type = (__runInitializers(this, _seatLayout_extraInitializers), __runInitializers(this, _type_initializers, void 0));
+        contractAddress = (__runInitializers(this, _type_extraInitializers), __runInitializers(this, _contractAddress_initializers, void 0));
+        organizerId = (__runInitializers(this, _contractAddress_extraInitializers), __runInitializers(this, _organizerId_initializers, void 0));
         constructor() {
-            __runInitializers(this, _priceCap_extraInitializers);
+            __runInitializers(this, _organizerId_extraInitializers);
         }
     };
 })();

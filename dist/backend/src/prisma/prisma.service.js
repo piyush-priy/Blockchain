@@ -54,7 +54,8 @@ let PrismaService = (() => {
         }
         constructor() {
             super({
-                datasources: { db: {
+                datasources: {
+                    db: {
                         url: "postgresql://postgres:FraZ@123$@localhost:5432/ticket-app?schema=public",
                     },
                 },

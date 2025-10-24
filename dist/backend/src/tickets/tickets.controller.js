@@ -50,6 +50,9 @@ let TicketsController = (() => {
     let _markTicketUsed_decorators;
     let _getTicketStatus_decorators;
     let _getTicketMetadata_decorators;
+    let _updateOwner_decorators;
+    let _validateTicketForBurn_decorators;
+    let _confirmBurn_decorators;
     var TicketsController = class {
         static { _classThis = this; }
         static {
@@ -59,11 +62,17 @@ let TicketsController = (() => {
             _markTicketUsed_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard), (0, roles_decorator_1.Roles)('admin'), (0, common_1.Post)(':tokenId/mark-used')];
             _getTicketStatus_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard), (0, common_1.Get)(':tokenId/:contractAddress/status')];
             _getTicketMetadata_decorators = [(0, common_1.Get)('/metadata/:tokenId/:contractAddress')];
+            _updateOwner_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard), (0, common_1.Patch)('update-owner'), (0, common_1.HttpCode)(common_1.HttpStatus.OK)];
+            _validateTicketForBurn_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard), (0, roles_decorator_1.Roles)('organizer', 'admin'), (0, common_1.Post)('validate-burn'), (0, common_1.HttpCode)(common_1.HttpStatus.OK)];
+            _confirmBurn_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard), (0, roles_decorator_1.Roles)('organizer', 'admin'), (0, common_1.Post)('confirm-burn'), (0, common_1.HttpCode)(common_1.HttpStatus.OK)];
             __esDecorate(this, null, _getMyTickets_decorators, { kind: "method", name: "getMyTickets", static: false, private: false, access: { has: obj => "getMyTickets" in obj, get: obj => obj.getMyTickets }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _createTicket_decorators, { kind: "method", name: "createTicket", static: false, private: false, access: { has: obj => "createTicket" in obj, get: obj => obj.createTicket }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _markTicketUsed_decorators, { kind: "method", name: "markTicketUsed", static: false, private: false, access: { has: obj => "markTicketUsed" in obj, get: obj => obj.markTicketUsed }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _getTicketStatus_decorators, { kind: "method", name: "getTicketStatus", static: false, private: false, access: { has: obj => "getTicketStatus" in obj, get: obj => obj.getTicketStatus }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _getTicketMetadata_decorators, { kind: "method", name: "getTicketMetadata", static: false, private: false, access: { has: obj => "getTicketMetadata" in obj, get: obj => obj.getTicketMetadata }, metadata: _metadata }, null, _instanceExtraInitializers);
+            __esDecorate(this, null, _updateOwner_decorators, { kind: "method", name: "updateOwner", static: false, private: false, access: { has: obj => "updateOwner" in obj, get: obj => obj.updateOwner }, metadata: _metadata }, null, _instanceExtraInitializers);
+            __esDecorate(this, null, _validateTicketForBurn_decorators, { kind: "method", name: "validateTicketForBurn", static: false, private: false, access: { has: obj => "validateTicketForBurn" in obj, get: obj => obj.validateTicketForBurn }, metadata: _metadata }, null, _instanceExtraInitializers);
+            __esDecorate(this, null, _confirmBurn_decorators, { kind: "method", name: "confirmBurn", static: false, private: false, access: { has: obj => "confirmBurn" in obj, get: obj => obj.confirmBurn }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(null, _classDescriptor = { value: _classThis }, _classDecorators, { kind: "class", name: _classThis.name, metadata: _metadata }, null, _classExtraInitializers);
             TicketsController = _classThis = _classDescriptor.value;
             if (_metadata) Object.defineProperty(_classThis, Symbol.metadata, { enumerable: true, configurable: true, writable: true, value: _metadata });
@@ -92,6 +101,21 @@ let TicketsController = (() => {
         }
         async getTicketMetadata(tokenId, contractAddress) {
             return this.ticketsService.getTicketMetadata(tokenId, contractAddress);
+        }
+        async updateOwner(updateOwnerDto) {
+            return this.ticketsService.updateTicketOwner(updateOwnerDto);
+        }
+        async validateTicketForBurn(tokenId, contractAddress, req) {
+            if (tokenId === undefined || !contractAddress) {
+                throw new common_1.BadRequestException('tokenId and contractAddress are required.');
+            }
+            const user = req.user;
+            const validationResult = await this.ticketsService.validateTicketForBurn(tokenId, contractAddress, user.id);
+            // If validation passes, return success. Frontend will then call the contract.
+            return { message: 'Ticket is valid for burning.' };
+        }
+        async confirmBurn(confirmBurnDto) {
+            return this.ticketsService.confirmTicketBurn(confirmBurnDto);
         }
     };
     return TicketsController = _classThis;

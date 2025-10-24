@@ -49,6 +49,7 @@ let EventsController = (() => {
     let _getAllEvents_decorators;
     let _getOrganizerEvents_decorators;
     let _updateEvent_decorators;
+    let _getUnavailableSeats_decorators;
     let _deleteEvent_decorators;
     let _updateStatus_decorators;
     let _getSales_decorators;
@@ -56,10 +57,11 @@ let EventsController = (() => {
         static { _classThis = this; }
         static {
             const _metadata = typeof Symbol === "function" && Symbol.metadata ? Object.create(null) : void 0;
-            _createEvent_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard), (0, roles_decorator_1.Roles)('organizer'), (0, common_1.Post)()];
+            _createEvent_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard), (0, common_1.Post)()];
             _getAllEvents_decorators = [(0, common_1.Get)()];
             _getOrganizerEvents_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard), (0, roles_decorator_1.Roles)('organizer'), (0, common_1.Get)('organizer/:id')];
             _updateEvent_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard), (0, roles_decorator_1.Roles)('organizer'), (0, common_1.Put)(':id')];
+            _getUnavailableSeats_decorators = [(0, common_1.Get)(':id/unavailable-seats')];
             _deleteEvent_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard), (0, roles_decorator_1.Roles)('organizer'), (0, common_1.Delete)(':id')];
             _updateStatus_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard, roles_guard_1.RolesGuard), (0, roles_decorator_1.Roles)('admin'), (0, common_1.Put)(':id/status')];
             _getSales_decorators = [(0, common_1.UseGuards)(jwt_auth_guard_1.JwtAuthGuard), (0, common_1.Get)(':id/sales')];
@@ -67,6 +69,7 @@ let EventsController = (() => {
             __esDecorate(this, null, _getAllEvents_decorators, { kind: "method", name: "getAllEvents", static: false, private: false, access: { has: obj => "getAllEvents" in obj, get: obj => obj.getAllEvents }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _getOrganizerEvents_decorators, { kind: "method", name: "getOrganizerEvents", static: false, private: false, access: { has: obj => "getOrganizerEvents" in obj, get: obj => obj.getOrganizerEvents }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _updateEvent_decorators, { kind: "method", name: "updateEvent", static: false, private: false, access: { has: obj => "updateEvent" in obj, get: obj => obj.updateEvent }, metadata: _metadata }, null, _instanceExtraInitializers);
+            __esDecorate(this, null, _getUnavailableSeats_decorators, { kind: "method", name: "getUnavailableSeats", static: false, private: false, access: { has: obj => "getUnavailableSeats" in obj, get: obj => obj.getUnavailableSeats }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _deleteEvent_decorators, { kind: "method", name: "deleteEvent", static: false, private: false, access: { has: obj => "deleteEvent" in obj, get: obj => obj.deleteEvent }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _updateStatus_decorators, { kind: "method", name: "updateStatus", static: false, private: false, access: { has: obj => "updateStatus" in obj, get: obj => obj.updateStatus }, metadata: _metadata }, null, _instanceExtraInitializers);
             __esDecorate(this, null, _getSales_decorators, { kind: "method", name: "getSales", static: false, private: false, access: { has: obj => "getSales" in obj, get: obj => obj.getSales }, metadata: _metadata }, null, _instanceExtraInitializers);
@@ -85,6 +88,7 @@ let EventsController = (() => {
                 throw new common_1.BadRequestException('Missing required fields: name, date, venue, type, description, posterUrl.');
             }
             const organizerId = req.user.id;
+            console.log('Creating event for organizer ID:', organizerId);
             return this.eventsService.createEvent(dto, organizerId);
         }
         // --- Get All Events ---
@@ -105,6 +109,10 @@ let EventsController = (() => {
         // --- Update Event (Organizer Only) ---
         async updateEvent(id, dto) {
             return this.eventsService.updateEvent(+id, dto);
+        }
+        // --- Get Unavailable Seats for Event ---
+        async getUnavailableSeats(eventId) {
+            return this.eventsService.getUnavailableSeats(eventId);
         }
         // --- Delete Event (Organizer Only) ---
         async deleteEvent(id) {
