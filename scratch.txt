@@ -11,6 +11,7 @@ Track ticket ownership and status change - Complex frontend logic
 [ DONE ] Display seat number in tickets
 [ DONE ] Display entire ticket instead of QR, add option to download tickets
 Admin dashboard updation
+[ FIX ] Not all ticket are minting properly
 
 Broken API Endpoints
 [ DONE ] GET http://localhost:3001/events/${event.id}/unavailable-seats

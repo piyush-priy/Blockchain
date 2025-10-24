@@ -5,6 +5,7 @@ import PageTitle from '../components/PageTitle';
 import Marketplace from '../../artifacts/contracts/Marketplace.sol/Marketplace.json';
 import TicketNFT from '../../artifacts/contracts/TicketNFT.sol/TicketNFT.json';
 import { MARKETPLACE_ADDRESS } from '../config';
+import './marketplace.css';
 
 const MarketplacePage = () => {
     const { provider, showMessage, currentUser: user } = useContext(AppContext);
@@ -66,6 +67,7 @@ const MarketplacePage = () => {
                 );
 
                 setListedTickets(ticketsWithMetadata);
+                console.log("Fetched listed tickets:", ticketsWithMetadata);
 
             } catch (error) {
                 console.error("Failed to fetch listed tickets:", error);
@@ -130,18 +132,29 @@ const MarketplacePage = () => {
 
     };
 
-    if (loading) return <p className="text-center">Loading marketplace...</p>;
+    if (loading) return (
+        <div className="marketplace-container">
+            <PageTitle title="Secondary Marketplace" subtitle="Buy and sell tickets from other users" />
+            <div className="loading-container">
+                <div className="loading-spinner"></div>
+                <span>Loading marketplace...</span>
+            </div>
+        </div>
+    );
 
     return (
-        <div className="container mx-auto px-4 py-8">
+        <div className="marketplace-container">
             <PageTitle title="Secondary Marketplace" subtitle="Buy and sell tickets from other users" />
             {listedTickets.length === 0 ? (
-                <div className="text-center bg-gray-800 p-8 rounded-lg">
-                    <h3 className="text-xl text-white">No tickets are currently for sale.</h3>
-                    <p className="text-gray-400 mt-2">Check back later or list one of your own from your profile!</p>
+                <div className="empty-state">
+                    <svg className="empty-state-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 5v2m0 4v2m0 4v2M5 5a2 2 0 00-2 2v3a2 2 0 110 4v3a2 2 0 002 2h14a2 2 0 002-2v-3a2 2 0 110-4V7a2 2 0 00-2-2H5z" />
+                    </svg>
+                    <h3>No tickets are currently for sale.</h3>
+                    <p>Check back later or list one of your own from your profile!</p>
                 </div>
             ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="marketplace-grid">
                     {listedTickets.map(ticket => {
                         // Helper function to find attributes from the metadata
                         const findAttr = (trait_type) => {
@@ -153,24 +166,74 @@ const MarketplacePage = () => {
 
                         // Format the date for display
                         const formattedDate = eventDate !== 'N/A'
-                            ? new Date(eventDate).toLocaleDateString()
+                            ? new Date(eventDate).toLocaleDateString('en-US', {
+                                year: 'numeric',
+                                month: 'short',
+                                day: 'numeric'
+                            })
                             : 'N/A';
 
+                        // Shorten seller address
+                        const shortenedSeller = `${ticket.seller.slice(0, 6)}...${ticket.seller.slice(-4)}`;
+
                         return (
-                            <div key={ticket.listingId.toString()} className="bg-gray-800 rounded-lg shadow-lg p-4 flex flex-col justify-between transform hover:-translate-y-1 transition-transform">
-                                <img src={ticket.image} alt={ticket.name} className="rounded-md mb-4 aspect-[2/3] object-cover" />
-                                <div>
-                                    <h3 className="text-xl font-bold text-white truncate">{ticket.name}</h3>
-                                    <p className="text-gray-400 text-sm truncate">Seller: {ticket.seller}</p>
-
-                                    {/* --- ADDED DATE AND VENUE --- */}
-                                    <p className="text-gray-400 text-sm truncate">Venue: {eventVenue}</p>
-                                    <p className="text-gray-400 text-sm">Date: {formattedDate}</p>
-
-                                    <p className="text-lg font-semibold text-indigo-400 mt-2">{ethers.formatEther(ticket.price)} ETH</p>
+                            <div key={ticket.listingId.toString()} className="ticket-card">
+                                {/* Event Banner */}
+                                <div className="event-banner-container">
+                                    <img
+                                        src={ticket.image}
+                                        alt={ticket.name}
+                                        className="event-banner"
+                                    />
+                                    <div className="banner-overlay"></div>
+                                    <div className="event-name-badge">
+                                        <h3 className="event-name">{ticket.name}</h3>
+                                    </div>
                                 </div>
-                                <button onClick={() => handleBuyTicket(ticket)} className="mt-4 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">
-                                    Buy Ticket
+
+                                {/* Ticket Details */}
+                                <div className="ticket-details">
+                                    <div className="detail-row">
+                                        <svg className="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                                        </svg>
+                                        <span className="detail-label">Seller</span>
+                                        <span className="detail-value seller">{shortenedSeller}</span>
+                                    </div>
+
+                                    <div className="detail-row">
+                                        <svg className="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                                        </svg>
+                                        <span className="detail-label">Venue</span>
+                                        <span className="detail-value">{eventVenue}</span>
+                                    </div>
+
+                                    <div className="detail-row">
+                                        <svg className="detail-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                        </svg>
+                                        <span className="detail-label">Date</span>
+                                        <span className="detail-value">{formattedDate}</span>
+                                    </div>
+                                </div>
+
+                                {/* Price Section */}
+                                <div className="price-section">
+                                    <span className="price-label">Price</span>
+                                    <div className="price-value">
+                                        {ethers.formatEther(ticket.price)}
+                                        <span className="price-currency">ETH</span>
+                                    </div>
+                                </div>
+
+                                {/* Buy Button */}
+                                <button
+                                    onClick={() => handleBuyTicket(ticket)}
+                                    className="buy-button"
+                                >
+                                    <span>Buy Ticket</span>
                                 </button>
                             </div>
                         );
