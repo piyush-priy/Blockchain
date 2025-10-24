@@ -42,7 +42,8 @@ Create `backend/.env`:
 DATABASE_URL = "postgresql://<username>:<password>@localhost:<port>/ticket-app?schema=public"
 JWT_SECRET=supersecretjwt
 PORT=3001
-```# Blockchain-Based Anti-Scalping Ticketing System
+```
+# Blockchain-Based Anti-Scalping Ticketing System
 
 A full-stack dApp for creating events, minting NFT tickets, and running a resale marketplace with anti-scalping rules.
 
