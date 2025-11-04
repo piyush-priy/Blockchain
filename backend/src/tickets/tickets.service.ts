@@ -95,7 +95,7 @@ export class TicketsService {
             const ticket = await this.prisma.tickets.findFirst({
                 where: {
                     tokenId,
-                    event: { contractAddress: contractAddress.toLowerCase() },
+                    event: { contractAddress: contractAddress },
                 },
                 select: { status: true },
             });
@@ -128,7 +128,7 @@ export class TicketsService {
                 name: `Ticket for ${e.name} - #${ticket.tokenId}`,
                 description: `This NFT is a ticket for ${e.name} at ${e.venue} on ${e.date}.`,
                 image:
-                    'https://via.placeholder.com/500/FF0000/FFFFFF?text=EVENT+TICKET',
+                    e.posterUrl,
                 attributes: [
                     { trait_type: 'Event', value: e.name },
                     { trait_type: 'Date', value: e.date },
