@@ -26,7 +26,8 @@ const EventForm = ({ onEventCreated }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-        setFormData(prev => ({ ...prev, [name]: value }));
+        const val = e.target.type === 'number' ? parseFloat(value) : value;
+        setFormData(prev => ({ ...prev, [name]: val }));
     };
 
     const handleSubmit = async (e) => {
@@ -40,6 +41,9 @@ const EventForm = ({ onEventCreated }) => {
         if (!currentUser || !currentUser.wallet) {
             return showMessage("User wallet information is not available. Please log in again.", "error");
         }
+        if (formData.maxResaleCount < 0 || formData.priceCap < 100) {
+            return showMessage("Max resales must be 0 or more, and Price Cap must be 100% or more.", "error");
+        }
 
         setLoading(true);
         const toastId = showMessage("Deploying event contract... Please confirm in wallet.", "loading");
@@ -48,7 +52,10 @@ const EventForm = ({ onEventCreated }) => {
             const signer = await provider.getSigner();
             const factoryContract = new ethers.Contract(TICKET_NFT_FACTORY_ADDRESS, TicketNFTFactory.abi, signer);
             
-            const tx = await factoryContract.createEventContract();
+            const tx = await factoryContract.createEventContract(
+                formData.maxResaleCount,
+                formData.priceCap
+            );
             const receipt = await tx.wait();
 
             let newContractAddress = null;
