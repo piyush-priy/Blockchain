@@ -14,7 +14,10 @@ const MarketplacePage = () => {
 
     useEffect(() => {
         const fetchListedTickets = async () => {
-            if (!provider) return;
+            if (!provider) {
+                setLoading(false);
+                return;
+            }
             setLoading(true);
             try {
                 const marketplaceContract = new ethers.Contract(MARKETPLACE_ADDRESS, Marketplace.abi, provider);

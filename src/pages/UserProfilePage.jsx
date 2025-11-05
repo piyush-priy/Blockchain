@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useRef } from 'react';
-import './user-profile.css';
+import './UserProfilePage.css';
 import { ethers } from 'ethers';
 import { QRCodeSVG } from 'qrcode.react';
 import { toast } from 'react-hot-toast';
