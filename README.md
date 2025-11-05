@@ -1,130 +1,248 @@
 # Blockchain-Based Anti-Scalping Ticketing System
 
-This is a decentralized application (dApp) for booking event tickets, built on the Ethereum blockchain. It leverages smart contracts to manage ticket sales, resales, and ownership, with each ticket being a unique Non-Fungible Token (NFT). The application features a React frontend, a Node.js backend for user management, and Solidity smart contracts for on-chain logic.
+A full-stack dApp for creating events, minting NFT tickets, and running a resale marketplace with anti-scalping rules.
+
+- Frontend: React + Vite + TailwindCSS + Ethers v6
+- Backend: NestJS + Prisma (PostgreSQL) + JWT auth
+- Smart contracts: Hardhat + Solidity (Marketplace, TicketNFT, TicketNFTFactory)
+
+This README explains the architecture and gives end-to-end steps to run locally on Windows (PowerShell).
+
+## Quickstart (Windows, from scratch)
+
+Follow these steps in order to get everything running on localhost.
+
+1) Install dependencies
+
+```powershell
+# From repo root
+npm install
+cd backend
+npm install
+cd ..
+```
+
+2) Prepare PostgreSQL
+
+- Ensure PostgreSQL is running and create the database with the expected name/creds, or adjust the backend to your own DSN.
+- Defaults used by this repo (and hardcoded in `backend/src/prisma/prisma.service.ts` unless you change it):
+  - Host: localhost; Port: 5432; DB: ticket-app; User: postgres; Password: qwerty123
+
+Create DB via psql:
+
+```sql
+CREATE DATABASE "ticket-app";
+```
+
+3) Configure backend env
+
+Create `backend/.env`:
+
+```ini
+DATABASE_URL = "postgresql://<username>:<password>@localhost:<port>/ticket-app?schema=public"
+JWT_SECRET=supersecretjwt
+PORT=3001
+```
+
+If you use a different Postgres connection, either:
+- Edit `backend/src/prisma/prisma.service.ts` to use `process.env.DATABASE_URL`, or
+- Replace its hardcoded URL with your DSN directly.
+
+4) Generate Prisma client and apply migrations (one-time)
+
+```powershell
+cd backend
+npx prisma generate
+npx prisma migrate dev
+```
+
+If you want to see a real time display of the backend database, run the following command in a separate terminal:
+```
+npx prisma studio
+```
+
+5) Seed admin user (email: admin@ticket.com, password: admin123)
+
+```powershell
+cd backend/prisma
+node seed_admin.ts
+cd ../..
+```
+
+6) Start local blockchain and deploy contracts
+
+Open two terminals for these:
+
+- Terminal A — Hardhat node
+
+```powershell
+npx hardhat node
+```
+
+- Terminal B — Deploy contracts (after node is running)
+
+```powershell
+npx hardhat run scripts/deploy.cjs --network localhost
+```
+
+This prints two addresses:
+
+```
+export const MARKETPLACE_ADDRESS = "0x...";
+export const TICKET_NFT_FACTORY_ADDRESS = "0x...";
+```
+
+7) Point the frontend at your deployed contracts
+
+Edit `src/config.js` and set both addresses printed in step 6.
+
+8) Start backend and frontend
+
+- Terminal C — Backend (NestJS)
+
+```powershell
+cd backend
+npm run start:dev
+```
+
+- Terminal D — Frontend (Vite)
+
+```powershell
+npm run dev
+```
+
+Open http://localhost:5173 and log in with the seeded admin to explore the app.
+
+Tip: If the app can’t call contracts, re-check that `src/config.js` matches your latest deploy and that your wallet is on Hardhat Localhost (chainId 31337).
+
+### Verify your setup
+
+- Backend responds at http://localhost:3001/ (you should see NestJS JSON for unknown routes or 404)
+- Frontend loads at http://localhost:5173/
+- Dev wallet is connected to Hardhat Localhost (chainId 31337)
+- `src/config.js` contains the addresses printed by your last deploy
+- Login with admin@ticket.com / admin123 works
 
 ## Features
 
-  * **User Authentication:** Secure registration and login for users.
-  * **Event Creation:** Organizers can create new events, specifying details like name, date, venue, and ticket prices.
-  * **Seating Layout Creator:** A visual tool for organizers to design and save the seating arrangement for their events.
-  * **NFT-Based Tickets:** Each ticket is minted as an ERC-721 NFT, ensuring verifiable ownership and authenticity.
-  * **Seat Selection:** Users can visually select their desired seats for an event.
-  * **Ticket Marketplace:** A secondary market where users can list their NFT tickets for sale, with resale price caps set by the event organizer.
-  * **Organizer Dashboard:** A dedicated dashboard for event organizers to manage their created events.
-  * **User Profile:** A page for users to view their purchased tickets and manage their account.
+- Authentication (JWT): register/login; store wallet to profile
+- Event management: create events with date/venue/price caps; organizer dashboard
+- Seating layout: visual seat selection and NFT mint per seat
+- NFT tickets (ERC-721): one ticket per seat; burn/verify from Scanner
+- Marketplace: list/buy tickets with resale price cap
+- User profile: view owned tickets, history
 
-## How It Works
+## Project structure
 
-This application is composed of three main parts: a frontend, a backend, and smart contracts.
+```
+.
+├─ contracts/                  # Solidity sources (Marketplace, TicketNFT, TicketNFTFactory)
+├─ scripts/deploy.cjs          # Hardhat deploy script (prints addresses for frontend)
+├─ src/                        # React frontend
+│  ├─ config.js                # Contract addresses (update after deploy)
+│  ├─ context/AppContext.jsx   # App state, wallet connect, API calls
+│  └─ pages/                   # UI pages (Catalog, Detail, SeatSelection, Scanner...)
+├─ backend/                    # NestJS API (auth, events, tickets)
+│  ├─ prisma/schema.prisma     # PostgreSQL schema
+│  ├─ prisma/seed_admin.ts     # Seed admin user
+│  └─ src/prisma/prisma.service.ts # Prisma client (DB URL currently hardcoded)
+├─ hardhat.config.cjs          # Hardhat networks and dev accounts
+├─ vite.config.js              # Frontend dev server (default port 5173)
+└─ package.json                # Frontend scripts and dev deps
+```
 
-### 1\. Smart Contracts (Solidity)
+## Prerequisites
 
-The core logic of the application resides in a set of Solidity smart contracts:
+- Node.js 18+ and npm
+- Git
+- MetaMask browser extension
+- PostgreSQL (local)
 
-  * **`TicketNFTFactory.sol`:** A factory contract that allows event organizers to deploy new, unique `TicketNFT` contracts for each event they create. This ensures that each event's tickets are managed by a separate, independent contract.
-  * **`TicketNFT.sol`:** An ERC-721 compliant contract that represents the tickets for a single event. It handles the minting of new tickets, ownership transfers, and enforces the rules set by the event organizer (like resale limits).
-  * **`Marketplace.sol`:** A contract that facilitates the secondary market for tickets. It allows users to list their NFT tickets for sale and other users to purchase them.
+Recommended PostgreSQL local setup (matches current code defaults):
+- Host: localhost
+- Port: 5432
+- Database: ticket-app
+- User: postgres
+- Password: qwerty123
 
-### 2\. Backend (Node.js & Express)
+Note: The backend currently overrides DATABASE_URL and connects via a hardcoded URL in `backend/src/prisma/prisma.service.ts`. You can either use the above defaults or change that file to use your own connection string/env.
 
-The backend is a simple Node.js server that handles tasks that don't need to be on the blockchain, such as:
+## Environment variables
 
-  * **User Authentication:** Manages user registration and login, issuing JSON Web Tokens (JWT) for session management.
-  * **Event Metadata Storage:** Stores event details (like name, description, poster URL) in a database, linking them to the on-chain smart contract address.
+- Backend (NestJS):
+  - `JWT_SECRET` (required)
+  - `PORT` (optional, default 3001)
 
-### 3\. Frontend (React)
+Create `backend/.env` with at least:
 
-The frontend is a modern React application that provides the user interface for interacting with the dApp. It uses:
+```
+DATABASE_URL = "postgresql://<username>:<password>@localhost:<port>/ticket-app?schema=public"
+JWT_SECRET=supersecretjwt
+PORT=3001
+```
 
-  * **Ethers.js:** To communicate with the Ethereum blockchain, allowing users to connect their wallets (like MetaMask) and interact with the smart contracts.
-  * **React Router:** For navigating between different pages of the application.
-  * **Tailwind CSS:** For styling the user interface.
+If you change the DB connection, also update `backend/src/prisma/prisma.service.ts` to read from `process.env.DATABASE_URL` or to your DSN.
 
-## Getting Started
 
-Follow these instructions to get the project up and running on your local machine for development and testing.
+<!-- Consolidated into Quickstart above to avoid duplication -->
 
-### Prerequisites
+<!-- Consolidated Hardhat run steps into Quickstart above to avoid duplication -->
 
-  * **Node.js** (v18 or later recommended)
-  * **NPM** (comes with Node.js)
-  * A cryptocurrency wallet like **MetaMask** installed in your browser.
+### Optional: Add Hardhat Localhost in MetaMask
+- Network name: Hardhat Localhost
+- RPC URL: http://127.0.0.1:8545
+- Chain ID: 31337
+- Currency symbol: ETH
 
-### Installation and Setup
+Note: The repo pre-configures 10 funded dev accounts in `hardhat.config.cjs` (local dev only).
 
-1.  **Clone the repository:**
+<!-- Start commands consolidated into Quickstart above -->
 
-    ```shell
-    git clone https://github.com/piyush-priy/Blockchain.git
-    cd show-booking-app
-    ```
+## Key files and contracts
 
-2.  **Install frontend dependencies:**
+- `contracts/TicketNFTFactory.sol`: Deploys a dedicated `TicketNFT` contract per event
+- `contracts/TicketNFT.sol`: ERC-721 tickets per event (seat-based minting)
+- `contracts/Marketplace.sol`: Lists/buys tickets (enforces resale price caps)
+- `scripts/deploy.cjs`: Deploys Factory and Marketplace and prints addresses for the frontend
+- `src/config.js`: Frontend contract addresses—must match your current deployment
+- `backend/src/main.ts`: Boots NestJS server (CORS + port)
+- `backend/src/prisma/prisma.service.ts`: Prisma connection (currently hardcoded Postgres URL)
 
-    ```shell
-    npm install
-    ```
+## Common issues and fixes
 
-3.  **Install backend dependencies:**
+- Contracts call error: "could not decode result data (0x)"
+  - Cause: Contracts not deployed to the network your wallet/app is connected to, or `src/config.js` has stale addresses.
+  - Fix: Re-run deploy on the correct network and update `src/config.js`. Refresh the app.
 
-    ```shell
-    cd backend
-    npm install
-    cd ..
-    ```
+- Backend fails to start (JWT error)
+  - Cause: `JWT_SECRET` not set.
+  - Fix: Create `backend/.env` with `JWT_SECRET` and restart.
 
-### Running the Project
+- Database connection error
+  - Cause: Postgres not running or wrong credentials.
+  - Fix: Start Postgres with the defaults above, or update `backend/src/prisma/prisma.service.ts` to your connection.
 
-1.  **Start a local Hardhat node:**
+- CORS or 401 responses from API
+  - Ensure backend is on port 3001 and frontend is 5173. Login first; then connect wallet.
 
-    This will start a local Ethereum blockchain for development purposes.
+- QR Scanner camera not working
+  - Ensure you allow camera permissions in your browser. Use Image Upload in Scanner page as fallback.
 
-    ```shell
-    npx hardhat node
-    ```
+## Scripts (root)
 
-2.  **Deploy the smart contracts:**
+```json
+{
+  "dev": "vite",
+  "build": "vite build",
+  "preview": "vite preview",
+  "lint": "eslint .",
+  "hardhat-deploy": "hardhat run scripts/deploy.cjs --network localhost"
+}
+```
 
-    In a new terminal, run the following command to deploy the smart contracts to the local Hardhat node.
+Run tests and compile contracts:
 
-    ```shell
-    npx hardhat run scripts/deploy.cjs --network localhost
-    ```
-
-3.  **Start the backend server:**
-
-    ```shell
-    cd backend
-    npm start
-    cd ..
-    ```
-
-4.  **Start the frontend development server:**
-
-    ```shell
-    npm run dev
-    ```
-
-Your application should now be running. You can open your web browser and navigate to `http://localhost:5173` to use the dApp.
-
-## Available Hardhat Tasks
-
-This project comes with several built-in Hardhat tasks:
-
-  * **Compile the contracts:**
-
-    ```shell
-    npx hardhat compile
-    ```
-
-  * **Run the tests:**
-
-    ```shell
-    npx hardhat test
-    ```
-
-  * **Check code coverage:**
-
-    ```shell
-    npx hardhat coverage
-    ```
+```powershell
+npx hardhat compile
+npx hardhat test
+```
