@@ -30,7 +30,7 @@ model Users {
 
 model Tickets {
   id Int @id @default(autoincrement())
-  tokenId Int @unique
+  tokenId Int
   eventId Int
   metadataUri String?
   ownerWallet String?
