@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { ethers } from 'ethers';
-import toast from 'react-hot-toast'; // **THE FIX IS HERE**: Added the missing import for toast notifications.
+import toast from 'react-hot-toast';
 import { AppContext } from '../context/AppContext';
 import LayoutCreator from './LayoutCreator';
 
@@ -77,10 +77,7 @@ const EventForm = ({ onEventCreated }) => {
             
             toast.loading("Contract deployed! Setting marketplace address...", { id: toastId });
 
-            // Instantiate the newly deployed contract
             const newEventContract = new ethers.Contract(newContractAddress, TicketNFT.abi, signer);
-
-            // Call its 'setMarketplaceAddress' function
             const setMarketplaceTx = await newEventContract.setMarketplaceAddress(MARKETPLACE_ADDRESS);
             await setMarketplaceTx.wait();
 
@@ -106,7 +103,6 @@ const EventForm = ({ onEventCreated }) => {
 
         } catch (error) {
             console.error("Event creation failed:", error);
-            // This toast will now work correctly.
             toast.error(`Event creation failed: ${error.reason || error.message}`, { id: toastId });
         } finally {
             setLoading(false);
@@ -129,7 +125,7 @@ const EventForm = ({ onEventCreated }) => {
                     <input type="date" name="date" onChange={handleChange} required className="bg-gray-700 text-white px-4 py-2 rounded-md" />
                 </div>
                 <input type="text" name="venue" placeholder="Venue" onChange={handleChange} required className="bg-gray-700 text-white px-4 py-2 rounded-md w-full" />
-                <input type="text" name="posterUrl" placeholder="Poster Image URL" onChange={handleChange} required className="bg-gray-700 text-white px-4 py-2 rounded-md w-full" />
+                <input type="text" name="posterUrl" placeholder="Poster Image URL (Optional)" onChange={handleChange} className="bg-gray-700 text-white px-4 py-2 rounded-md w-full" />
                 <textarea name="description" placeholder="Event Description" onChange={handleChange} required className="bg-gray-700 text-white px-4 py-2 rounded-md w-full min-h-[100px]"></textarea>
                 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -138,8 +134,8 @@ const EventForm = ({ onEventCreated }) => {
                         <option value="concert">Concert</option>
                         <option value="sports">Sports</option>
                     </select>
-                     <input type="number" name="maxResaleCount" placeholder="Max Resales (e.g., 3)" onChange={handleChange} className="bg-gray-700 text-white px-4 py-2 rounded-md" />
-                    <input type="number" name="priceCap" placeholder="Resale Price Cap % (e.g., 120)" onChange={handleChange} className="bg-gray-700 text-white px-4 py-2 rounded-md" />
+                     <input type="number" name="maxResaleCount" placeholder="Max Resales (e.g., 3)" value={formData.maxResaleCount} onChange={handleChange} className="bg-gray-700 text-white px-4 py-2 rounded-md" />
+                    <input type="number" name="priceCap" placeholder="Resale Price Cap % (e.g., 120)" value={formData.priceCap} onChange={handleChange} className="bg-gray-700 text-white px-4 py-2 rounded-md" />
                 </div>
 
                 <div className="bg-gray-700 p-4 rounded-md text-center">
@@ -163,7 +159,7 @@ const EventForm = ({ onEventCreated }) => {
                 <div className="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50">
                     <LayoutCreator
                         onSave={handleSaveLayout}
-                        onClose={() => setShowLayoutCreator(false)}
+                        onCancel={() => setShowLayoutCreator(false)} // Changed from 'onClose'
                     />
                 </div>
             )}
@@ -172,4 +168,3 @@ const EventForm = ({ onEventCreated }) => {
 };
 
 export default EventForm;
-

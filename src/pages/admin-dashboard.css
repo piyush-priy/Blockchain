@@ -4,30 +4,12 @@
     position: relative;
     isolation: isolate;
     overflow: hidden;
-    min-height: 100vh;
+    /* min-height: 100vh; */ /* <-- REMOVED */
 }
 
-/* Full-bleed background using fixed pseudo-elements */
-.admin-dashboard::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    z-index: 0;
-    pointer-events: none;
-    background:
-        radial-gradient(1200px 540px at 85% -10%, rgba(239, 68, 68, .18), transparent 60%),
-        radial-gradient(900px 420px at -10% 30%, rgba(190, 18, 60, .22), transparent 60%),
-        linear-gradient(135deg, #0a0a0b 0%, #0e0e12 40%, #111015 100%);
-}
+/* --- DELETED the ::before and ::after rules --- */
+/* The background rules that were covering the header are now gone. */
 
-.admin-dashboard::after {
-    content: "";
-    position: fixed;
-    inset: -5%;
-    z-index: 0;
-    pointer-events: none;
-    background: radial-gradient(ellipse at center, rgba(0, 0, 0, 0) 40%, rgba(0, 0, 0, .35) 100%);
-}
 
 /* Ensure page content stays above fixed background */
 .admin-dashboard>* {
