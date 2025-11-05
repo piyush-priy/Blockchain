@@ -82,7 +82,7 @@ const OrganizerDashboardPage = () => {
     };
 
     return (
-        <div className="organizer-dashboard container mx-auto px-4 py-8">
+        <div className="organizer-dashboard container mx-auto px-4 pt-16 pb-8">
             <PageTitle title="Organizer Dashboard" />
 
             <div className="mb-8 flex justify-center space-x-4">

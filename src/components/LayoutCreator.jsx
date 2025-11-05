@@ -81,9 +81,10 @@ const LayoutCreator = ({ onSave, onCancel }) => {
                         <div className="space-y-2">
                             {seatTypes.map(type => (
                                 <div key={type.id} className="flex items-center gap-2 bg-gray-700 p-2 rounded-md">
-                                    <input type="text" placeholder="Type Name (e.g. Premium)" value={type.typeName} onChange={e => updateSeatType(type.id, 'typeName', e.target.value)} className="p-2 w-full bg-gray-600 rounded-md" />
-                                    <input type="number" placeholder="Price" value={type.price} onChange={e => updateSeatType(type.id, 'price', e.target.value)} className="p-2 w-1/3 bg-gray-600 rounded-md" />
-                                    <button onClick={() => removeSeatType(type.id)} className="text-red-500 hover:text-red-400 p-2">&times;</button>
+                                    {/* --- THIS IS THE LAYOUT FIX --- */}
+                                    <input type="text" placeholder="Type Name (e.g. Premium)" value={type.typeName} onChange={e => updateSeatType(type.id, 'typeName', e.target.value)} className="p-2 flex-1 bg-gray-600 rounded-md" />
+                                    <input type="number" placeholder="Price" value={type.price} onChange={e => updateSeatType(type.id, 'price', e.target.value)} className="p-2 w-32 bg-gray-600 rounded-md" />
+                                    <button onClick={() => removeSeatType(type.id)} className="text-red-500 hover:text-red-400 p-2 flex-shrink-0">&times;</button>
                                 </div>
                             ))}
                         </div>
