@@ -1,4 +1,5 @@
 import React, { useState, useContext } from 'react';
+import './UserCatalogPage.css';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 import { AppContext } from '../context/AppContext';
 import PageTitle from '../components/PageTitle';

@@ -1,0 +1,281 @@
+/* user-profile.css */
+
+/* Container */
+.user-profile {
+  min-height: 100vh;
+  background: linear-gradient(to bottom, #0a0a0a, #1a1a1a);
+  padding: 2rem 1rem;
+}
+
+/* Hero Section */
+.up-hero {
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.up-hero-card {
+  background: linear-gradient(135deg, #1a0000 0%, #330000 100%);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 8px 32px rgba(220, 38, 38, 0.2);
+  position: relative;
+  overflow: hidden;
+}
+
+.up-hero-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: radial-gradient(circle at 80% 20%, rgba(220, 38, 38, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.up-hero-title {
+  font-size: 2rem;
+  font-weight: 800;
+  background: linear-gradient(to right, #ffffff, #fca5a5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+  line-height: 1.3;
+  position: relative;
+  z-index: 1;
+}
+
+.up-hero-sub {
+  font-size: 1.125rem;
+  color: #d1d5db;
+  line-height: 1.6;
+  max-width: 800px;
+  position: relative;
+  z-index: 1;
+}
+
+/* Action Buttons */
+.user-profile button {
+  transition: all 0.3s ease;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Show QR Button */
+.user-profile .bg-cyan-500 {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.user-profile .bg-cyan-500:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Sell Button */
+.user-profile .bg-indigo-600 {
+  background: linear-gradient(135deg, #7f1d1d 0%, #991b1b 100%);
+  box-shadow: 0 4px 12px rgba(127, 29, 29, 0.3);
+}
+
+.user-profile .bg-indigo-600:hover {
+  background: linear-gradient(135deg, #991b1b 0%, #7f1d1d 100%);
+  box-shadow: 0 6px 20px rgba(127, 29, 29, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Download Button */
+.user-profile .bg-blue-600 {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.user-profile .bg-blue-600:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Confirm & List Button */
+.user-profile .bg-green-600 {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+}
+
+.user-profile .bg-green-600:hover {
+  background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+  box-shadow: 0 6px 20px rgba(220, 38, 38, 0.5);
+  transform: translateY(-2px);
+}
+
+/* Modal Overlay */
+.user-profile .fixed.inset-0 {
+  backdrop-filter: blur(8px);
+}
+
+/* Modal Container */
+.user-profile .bg-gray-800 {
+  background: rgba(15, 15, 15, 0.95);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+}
+
+/* Modal Input */
+.user-profile input.bg-gray-700 {
+  background: rgba(26, 26, 26, 0.9);
+  border-color: rgba(220, 38, 38, 0.3);
+  color: #f1f5f9;
+}
+
+.user-profile input.bg-gray-700:focus {
+  outline: none;
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.2);
+}
+
+.user-profile input.bg-gray-700::placeholder {
+  color: #9ca3af;
+}
+
+/* Modal Text */
+.user-profile .text-white {
+  color: #f1f5f9;
+}
+
+.user-profile .text-gray-300 {
+  color: #d1d5db;
+}
+
+.user-profile .text-gray-400 {
+  color: #9ca3af;
+}
+
+/* Ticket Card in Modal - Keep Original Design */
+.user-profile .bg-white {
+  background: #ffffff;
+}
+
+/* Do not style ticket internals - let Tailwind handle it */
+
+/* Empty State */
+.user-profile .text-center.text-xl.text-gray-400 {
+  color: #9ca3af;
+  font-size: 1.25rem;
+  padding: 3rem 2rem;
+  background: rgba(10, 10, 10, 0.6);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Loading State */
+.user-profile .text-center.py-20.text-white {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  color: #d1d5db;
+  font-size: 1.125rem;
+}
+
+.user-profile .text-center.py-20.text-white::before {
+  content: '';
+  width: 48px;
+  height: 48px;
+  border: 4px solid rgba(220, 38, 38, 0.2);
+  border-top-color: #dc2626;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+/* Grid Animation */
+.user-profile .grid > * {
+  animation: fadeInUp 0.5s ease-out;
+}
+
+.user-profile .grid > *:nth-child(1) { animation-delay: 0.05s; }
+.user-profile .grid > *:nth-child(2) { animation-delay: 0.1s; }
+.user-profile .grid > *:nth-child(3) { animation-delay: 0.15s; }
+.user-profile .grid > *:nth-child(4) { animation-delay: 0.2s; }
+.user-profile .grid > *:nth-child(5) { animation-delay: 0.25s; }
+.user-profile .grid > *:nth-child(6) { animation-delay: 0.3s; }
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+  .up-hero-card {
+    padding: 1.5rem;
+  }
+
+  .up-hero-title {
+    font-size: 1.5rem;
+  }
+
+  .up-hero-sub {
+    font-size: 1rem;
+  }
+
+  .user-profile .grid {
+    gap: 1.5rem;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .up-hero-title {
+    font-size: 1.75rem;
+  }
+}
+
+/* Button Active States */
+.user-profile button:active {
+  transform: translateY(0) !important;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.3) !important;
+}
+
+/* Modal Animation - Disabled for ticket display */
+.user-profile .fixed.inset-0 {
+  /* No animation for modal */
+}
+
+.user-profile .fixed.inset-0 > div {
+  /* No animation for modal content */
+}
+
+/* Ticket Modal Decoration Circles */
+.user-profile .absolute.rounded-full.bg-gray-800 {
+  background: #0a0a0a;
+  border: 2px solid rgba(220, 38, 38, 0.3);
+}
+
+/* Seat Identifier Highlight */
+.user-profile .text-indigo-600 {
+  color: #dc2626 !important;
+}
+
+/* Input Focus Glow */
+.user-profile input:focus {
+  background: rgba(26, 26, 26, 0.95);
+}

@@ -1,0 +1,210 @@
+/* UserCatalogPage.css */
+
+/* Hero Section */
+.user-catalog {
+  background: linear-gradient(to bottom, #0a0a0a, #1a1a1a);
+  min-height: 100vh;
+}
+
+.uc-hero {
+  background: linear-gradient(135deg, #000000 0%, #1a0000 50%, #330000 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.uc-hero::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 50%, rgba(220, 38, 38, 0.15) 0%, transparent 50%),
+    radial-gradient(circle at 80% 80%, rgba(239, 68, 68, 0.15) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.uc-hero-card {
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(220, 38, 38, 0.2);
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 20px 60px rgba(220, 38, 38, 0.2);
+  position: relative;
+}
+
+.uc-hero-content {
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.uc-hero-title {
+  font-size: 2.5rem;
+  font-weight: 800;
+  background: linear-gradient(to right, #ffffff, #fca5a5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1.5rem;
+  line-height: 1.2;
+}
+
+.uc-hero-sub {
+  font-size: 1.125rem;
+  color: #d1d5db;
+  line-height: 1.7;
+  margin-bottom: 2rem;
+}
+
+.uc-hero-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.uc-hero-features li {
+  display: flex;
+  align-items: center;
+  font-size: 0.95rem;
+  color: #e5e7eb;
+  font-weight: 500;
+  padding: 0.75rem 1rem;
+  background: rgba(220, 38, 38, 0.1);
+  border: 1px solid rgba(220, 38, 38, 0.3);
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.uc-hero-features li:hover {
+  background: rgba(220, 38, 38, 0.2);
+  border-color: rgba(220, 38, 38, 0.5);
+  transform: translateY(-2px);
+}
+
+.uc-hero-features li::before {
+  content: '✓';
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  margin-right: 0.75rem;
+  background: #dc2626;
+  color: white;
+  border-radius: 50%;
+  font-size: 0.75rem;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* Filter Buttons */
+.uc-filters {
+  flex-wrap: wrap;
+}
+
+.uc-filter-btn {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  border: 1px solid transparent;
+}
+
+.uc-filter-btn:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.uc-filter-btn.bg-indigo-600 {
+  background-color: #dc2626 !important;
+  border-color: rgba(220, 38, 38, 0.5);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4);
+}
+
+.uc-filter-btn.bg-indigo-600:hover {
+  background-color: #b91c1c !important;
+}
+
+/* Events Grid */
+.uc-grid {
+  padding-bottom: 3rem;
+}
+
+.uc-grid > div {
+  transition: transform 0.3s ease;
+}
+
+.uc-grid > div:hover {
+  transform: translateY(-4px);
+}
+
+.uc-grid img {
+  transition: transform 0.4s ease;
+}
+
+.uc-grid > div:hover img {
+  transform: scale(1.05);
+}
+
+/* Event Card Title */
+.uc-card-title {
+  color: #f1f5f9;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+  .uc-hero-card {
+    padding: 1.5rem;
+  }
+
+  .uc-hero-title {
+    font-size: 1.75rem;
+  }
+
+  .uc-hero-sub {
+    font-size: 1rem;
+  }
+
+  .uc-hero-features {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  .uc-hero-title {
+    font-size: 2rem;
+  }
+}
+
+/* Loading state for images */
+.uc-grid img[loading="lazy"] {
+  background: linear-gradient(90deg, #1a1a1a 0%, #2a2a2a 50%, #1a1a1a 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Container spacing */
+.container {
+  position: relative;
+  z-index: 1;
+}

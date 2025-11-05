@@ -169,8 +169,7 @@ const ScannerPage = () => {
             setVerificationStatus({ status: 'burning', message: 'Confirming burn with server...' });
             toast.loading('Confirming burn...', { id: toastId });
 
-            // **YOU NEED TO IMPLEMENT THIS BACKEND ENDPOINT**
-            // It should update the ticket status to 'used' or 'burned'
+            // Backend should update the ticket status to 'used' or 'burned'
             const confirmResponse = await fetch(`http://localhost:3001/tickets/confirm-burn`, {
                 method: 'POST',
                 headers: {

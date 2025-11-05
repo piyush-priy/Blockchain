@@ -30,6 +30,10 @@ contract TicketNFT is
     // Royalty fee in basis points (e.g., 500 = 5%)
     uint96 public royaltyFeeBasisPoints;
 
+    // State Variables for event-wide resale restrictions
+    uint16 public immutable maxResaleCount;
+    uint16 public immutable resalePriceCapPct;
+
     // Struct to hold extra on-chain data for each ticket
     struct Ticket {
         uint256 lastSalePrice;
@@ -38,11 +42,14 @@ contract TicketNFT is
 
     mapping(uint256 => Ticket) public ticketData;
 
-    constructor(
-        address initialOwner
-    ) ERC721("TicketNFT", "TKT") Ownable(initialOwner) {
+    constructor(address initialOwner, uint16 _maxResaleCount, uint16 _resalePriceCapPct)
+        ERC721("TicketNFT", "TKT")
+        Ownable(initialOwner)
+    {
         // Set a default royalty fee of 5% upon deployment
         royaltyFeeBasisPoints = 500;
+        maxResaleCount = _maxResaleCount;
+        resalePriceCapPct = _resalePriceCapPct;
     }
 
     /**
@@ -211,13 +218,7 @@ contract TicketNFT is
     )
         public
         view
-        override(
-            // MODIFIED: Added ERC721URIStorage to the override list
-            ERC721,
-            ERC721Enumerable,
-            ERC721URIStorage,
-            ERC2981
-        )
+        override(ERC721, ERC721Enumerable, ERC721URIStorage, ERC2981)
         returns (bool)
     {
         return super.supportsInterface(interfaceId);

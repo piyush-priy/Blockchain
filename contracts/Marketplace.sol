@@ -8,6 +8,11 @@ interface ITicketNFT {
     function ownerOf(uint256 tokenId) external view returns (address);
     function transferFrom(address from, address to, uint256 tokenId) external;
     function updateTicketSale(uint256 tokenId, uint256 price) external;
+
+    // Read ticket state and event rules
+    function ticketDetails(uint256 tokenId) external view returns (uint256 lastSalePrice, uint256 resaleCount);
+    function maxResaleCount() external view returns (uint16);
+    function resalePriceCapPct() external view returns (uint16);
 }
 
 contract Marketplace is Ownable {
@@ -52,8 +57,28 @@ contract Marketplace is Ownable {
     function listTicket(address nftContract, uint256 tokenId, uint256 price) external {
         require(price > 0, "Marketplace: Price must be greater than zero");
         
+        ITicketNFT ticketContract = ITicketNFT(nftContract);
+
+        // Get the current state of the ticket
+        (uint256 lastPrice, uint256 currentCount) = ticketContract.ticketDetails(tokenId);
+
+        // Get the rules for this event
+        uint16 maxCount = ticketContract.maxResaleCount();
+        uint16 capPct = ticketContract.resalePriceCapPct();
+
+        // 3. Enforce Resale Count Limit
+        require(currentCount < maxCount, "Marketplace: Ticket has reached max resale limit");
+
+        // 4. Enforce Price Cap (if a cap is set and it's not a primary sale)
+        // We check lastPrice > 0 because a primary sale ticket has count 0 but a lastPrice > 0
+        if (capPct > 0 && lastPrice > 0) {
+            uint256 maxPrice = (lastPrice * capPct) / 100;
+            require(price <= maxPrice, "Marketplace: Price exceeds resale cap");
+        }
+
+
         // Transfer the NFT from the seller to this marketplace contract (escrow)
-        ITicketNFT(nftContract).transferFrom(msg.sender, address(this), tokenId);
+        ticketContract.transferFrom(msg.sender, address(this), tokenId);
 
         uint256 listingId = _nextListingId++;
         listings[listingId] = Listing({

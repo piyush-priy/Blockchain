@@ -25,10 +25,13 @@ contract TicketNFTFactory {
      * The ownership of the new contract is transferred to the message sender (the organizer).
      * Emits an {EventContractCreated} event.
      */
-    function createEventContract() external {
+    function createEventContract(
+        uint16 _maxResaleCount,
+        uint16 _resalePriceCapPct
+    ) external {
         // Create a new TicketNFT contract, passing the creator's address (msg.sender)
         // to the constructor, making them the owner of the new contract.
-        TicketNFT newEventContract = new TicketNFT(payable(msg.sender));
+        TicketNFT newEventContract = new TicketNFT(payable(msg.sender), _maxResaleCount, _resalePriceCapPct);
         
         // Add the new contract's address to our tracking array.
         deployedEventContracts.push(newEventContract);
